@@ -973,6 +973,19 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [tab, setTab] = useState(null);
 
+  // ── Helpers cookies ──
+  const setCookie = (name, value, days = 30) => {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+  };
+  const getCookie = (name) => {
+    const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : null;
+  };
+  const deleteCookie = (name) => {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  };
+
   // ── Chargement initial ──
   useEffect(() => {
     const loadAll = async () => {
@@ -983,9 +996,9 @@ export default function App() {
         const userList = profilesData || [];
         setUsers(userList);
 
-        // Restaurer session
+        // Restaurer session via cookie
         try {
-          const saved = localStorage.getItem("club_session");
+          const saved = getCookie("club_session");
           if (saved) {
             const parsed = JSON.parse(saved);
             const found = userList.find(u => u.id === parsed.id);
@@ -1012,12 +1025,12 @@ export default function App() {
   }, []);
 
   const handleLogin = (u) => {
-    try { localStorage.setItem("club_session", JSON.stringify({ id: u.id })); } catch(e) {}
+    try { setCookie("club_session", JSON.stringify({ id: u.id }), 30); } catch(e) {}
     setUser(u); setTab(u.role === "admin" ? "dashboard" : "saisie");
   };
 
   const handleLogout = () => {
-    try { localStorage.removeItem("club_session"); } catch(e) {}
+    try { deleteCookie("club_session"); } catch(e) {}
     setUser(null); setTab(null);
   };
 
