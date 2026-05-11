@@ -326,10 +326,10 @@ function CoachSaisie({ user, entries, dbOps }) {
           {showCats && (
             <div>
               <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>Catégories <span style={{ color: "#ef4444" }}>*</span></label>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))", gap: 8 }}>
                 {CATEGORIES.map(cat => {
                   const sel = categories.includes(cat);
-                  return <div key={cat} onClick={() => toggleCat(cat)} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: 10, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.03)", color: sel ? "#60a5fa" : "#475569", fontWeight: sel ? 700 : 400, fontSize: 14, userSelect: "none" }}>{cat}{sel && <div style={{ fontSize: 10, marginTop: 2, color: "#34d399" }}>✓</div>}</div>;
+                  return <div key={cat} onClick={() => toggleCat(cat)} style={{ textAlign: "center", padding: "10px 6px", borderRadius: 10, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.03)", color: sel ? "#60a5fa" : "#475569", fontWeight: sel ? 700 : 400, fontSize: 13, userSelect: "none" }}>{cat}{sel && <div style={{ fontSize: 10, marginTop: 2, color: "#34d399" }}>✓</div>}</div>;
                 })}
               </div>
               {categories.length === 0 && <div style={{ color: "#f87171", fontSize: 11, marginTop: 6 }}>⚠️ Sélectionnez au moins une catégorie</div>}
