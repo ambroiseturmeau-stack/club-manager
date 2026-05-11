@@ -609,8 +609,7 @@ function exportExcel(entries, rates) {
   const BOM = "﻿";
   const csvContent = BOM + [headers, ...rows]
     .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
-    .join("
-");
+    .join("\n");
 
   // Download
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
