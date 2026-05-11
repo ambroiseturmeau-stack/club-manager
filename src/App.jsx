@@ -9,7 +9,7 @@ const supabase = createClient(
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const ACTIVITY_LIST = ["Entraînement", "Fartage", "Course", "Administration"];
-const CATEGORIES = ["U8", "U10", "U12"];
+const CATEGORIES = ["U8", "U10", "U12", "U14", "U16", "U18", "Master"];
 const ACTIVITIES_WITH_CATEGORIES = ["Entraînement", "Course"];
 const DEFAULT_RATES = { "Entraînement": 28, "Fartage": 22, "Course": 25, "Administration": 20 };
 const DEFAULT_BUDGETS = { "Entraînement": 5000, "Fartage": 2000, "Course": 3000, "Administration": 1500 };
@@ -338,10 +338,10 @@ function CoachSaisie({ user, entries, dbOps }) {
 
           {/* Heures */}
           <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Heures effectuées <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Heures effectuées par journée<span style={{ color: "#ef4444" }}>*</span></label>
             <select value={hours} onChange={e => setHours(e.target.value)} style={{ ...fieldStyle, background: !hours ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.04)", border: !hours ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(255,255,255,0.08)", color: hours ? "#000" : "#64748b" }}>
               <option value="">— Sélectionner —</option>
-              {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
+              {[1,1.5,2,2.5,3,3.5,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
             </select>
             {!hours && <div style={{ color: "#f87171", fontSize: 11, marginTop: 5 }}>⚠️ Les heures sont obligatoires</div>}
           </div>
@@ -747,7 +747,7 @@ function AdminRapports({ entries, rates }) {
       {/* Catégories par activité */}
       {actStats.some(a => a.hasCategories&&a.byCategory.length>0) && (
         <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par catégorie (U8 / U10 / U12)</h3>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par catégorie (U8 / U10 / U12 / U14 / U16 / U18 / Master)</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
             {actStats.filter(a => a.hasCategories&&a.byCategory.length>0).map(a => (
               <div key={a.activity}>
