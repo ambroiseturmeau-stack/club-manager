@@ -31,7 +31,7 @@ function Badge({ activity }) {
   return <span style={{ background: c.bg, color: c.text, padding: "3px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>{activity}</span>;
 }
 function Card({ children, style = {} }) {
-  return <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: 28, ...style }}>{children}</div>;
+  return <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 18, ...style }}>{children}</div>;
 }
 function Btn({ children, onClick, variant = "primary", disabled = false, small = false, style = {} }) {
   const base = { border: "none", borderRadius: 10, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all .15s", opacity: disabled ? 0.5 : 1, ...style };
@@ -62,7 +62,7 @@ function Select({ label, children, ...props }) {
 }
 function SectionTitle({ children, sub }) {
   return (
-    <div style={{ marginBottom: 24 }}>
+    <div style={{ marginBottom: 16 }}>
       <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#f1f5f9", letterSpacing: -0.3 }}>{children}</h2>
       {sub && <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>{sub}</p>}
     </div>
@@ -154,10 +154,10 @@ function LoginScreen({ onLogin, users }) {
     if (u) onLogin(u); else setErr("Identifiants incorrects");
   };
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080d14", fontFamily: "'Sora', sans-serif", position: "relative", overflow: "hidden" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-      <div style={{ position: "absolute", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", top: "10%", left: "20%", pointerEvents: "none" }} />
-      <div style={{ width: 400, position: "relative", zIndex: 1 }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080d14", fontFamily: "'Sora', sans-serif", position: "relative", overflow: "hidden", padding: "20px 16px" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+      <div style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", top: "10%", left: "20%", pointerEvents: "none" }} />
+      <div style={{ width: "100%", maxWidth: 400, position: "relative", zIndex: 1 }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg,#1e3a5f,#0f4c81)", border: "1px solid rgba(59,130,246,0.3)", marginBottom: 20, boxShadow: "0 0 40px rgba(59,130,246,0.15)" }}>
             <span style={{ fontSize: 32 }}>⛷️</span>
@@ -167,13 +167,35 @@ function LoginScreen({ onLogin, users }) {
         </div>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 32 }}>
           {err && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", color: "#f87171", fontSize: 13, marginBottom: 20 }}>⚠️ {err}</div>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <Input label="Email" type="email" placeholder="votre@email.fr" value={email} onChange={e => setEmail(e.target.value)} />
-            <Input label="Mot de passe" type="password" placeholder="••••••••" value={pwd} onChange={e => setPwd(e.target.value)} onKeyDown={e => e.key === "Enter" && handle()} />
-            <button onClick={handle} style={{ background: "linear-gradient(135deg,#3b82f6,#06b6d4)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 4, fontFamily: "inherit" }}>
+          <form action="#" onSubmit={e => { e.preventDefault(); handle(); }} style={{ display: "flex", flexDirection: "column", gap: 16 }} autoComplete="on">
+            <div>
+              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Email</label>
+              <input
+                type="email"
+                name="email"
+                autoComplete="email"
+                placeholder="votre@email.fr"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Mot de passe</label>
+              <input
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={pwd}
+                onChange={e => setPwd(e.target.value)}
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+            <button type="submit" style={{ background: "linear-gradient(135deg,#3b82f6,#06b6d4)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 4, fontFamily: "inherit" }}>
               Se connecter →
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
@@ -183,33 +205,34 @@ function LoginScreen({ onLogin, users }) {
 // ─── SHELL ────────────────────────────────────────────────────────────────────
 function Shell({ user, tab, setTab, onLogout, children }) {
   const isAdmin = user.role === "admin";
-  const coachTabs = [["saisie","✏️","Saisie des heures"],["rapport","📊","Mon rapport"],["compte","👤","Mon compte"]];
-  const adminTabs = [["dashboard","🏠","Dashboard"],["rapports","📈","Rapports"],["budget","💰","Budgets"],["parametres","⚙️","Paramètres"]];
+  const coachTabs = [["saisie","✏️","Saisie"],["rapport","📊","Rapport"],["compte","👤","Compte"]];
+  const adminTabs = [["dashboard","🏠","Dashboard"],["rapports","📈","Rapports"],["budget","💰","Budgets"],["parametres","⚙️","Params"]];
   const tabs = isAdmin ? adminTabs : coachTabs;
   return (
     <div style={{ minHeight: "100vh", background: "#080d14", fontFamily: "'Sora', sans-serif", color: "#e2e8f0", display: "flex", flexDirection: "column" }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       {/* Ligne 1 — Club Manager */}
-      <div style={{ background: "#0a111d", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "9px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+      <div style={{ background: "#0a111d", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "9px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 20 }}>⛷️</span>
           <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9", letterSpacing: -0.2 }}>Club Manager</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ color: "#64748b", fontSize: 12 }}>{isAdmin ? "👑" : "🎿"} {user.name}</span>
-          <button onClick={onLogout} style={{ padding: "5px 12px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Déconnexion</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : "🎿"} {user.name}</span>
+          <button onClick={onLogout} style={{ padding: "5px 10px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Quitter</button>
         </div>
       </div>
-      {/* Ligne 2 — Onglets */}
-      <div style={{ background: "#0c1422", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 24px", display: "flex", flexShrink: 0 }}>
+      {/* Ligne 2 — Onglets (scrollable horizontal sur mobile) */}
+      <div style={{ background: "#0c1422", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", flexShrink: 0, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
         {tabs.map(([k, icon, label]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "11px 18px", border: "none", background: tab === k ? "rgba(59,130,246,0.1)" : "transparent", color: tab === k ? "#60a5fa" : "#475569", fontWeight: tab === k ? 600 : 400, fontSize: 13, cursor: "pointer", fontFamily: "inherit", borderBottom: tab === k ? "2px solid #3b82f6" : "2px solid transparent", marginBottom: -1, transition: "all .15s" }}>
-            <span style={{ fontSize: 14 }}>{icon}</span>{label}
+          <button key={k} onClick={() => setTab(k)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "10px 16px", border: "none", background: tab === k ? "rgba(59,130,246,0.1)" : "transparent", color: tab === k ? "#60a5fa" : "#475569", fontWeight: tab === k ? 600 : 400, fontSize: 11, cursor: "pointer", fontFamily: "inherit", borderBottom: tab === k ? "2px solid #3b82f6" : "2px solid transparent", marginBottom: -1, transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <span style={{ fontSize: 16 }}>{icon}</span>
+            <span>{label}</span>
           </button>
         ))}
       </div>
       {/* Contenu */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>{children}</div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>{children}</div>
     </div>
   );
 }
@@ -260,7 +283,7 @@ function CoachSaisie({ user, entries, dbOps }) {
   const fieldStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
 
   return (
-    <div style={{ maxWidth: 560 }}>
+    <div style={{ maxWidth: "100%" }}>
       <SectionTitle sub="Saisissez vos heures pour la ou les dates sélectionnées">Saisie des heures</SectionTitle>
       <Card>
         <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>{editId ? "✏️ Modifier la saisie" : "➕ Nouvelle saisie"}</h3>
@@ -411,13 +434,13 @@ function CoachRapport({ user, entries, dbOps }) {
     <div>
       <SectionTitle sub="Visualisez vos heures par activité">Mon rapport d'activité</SectionTitle>
       <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} style={{ width: 220 }}>
+        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} style={{ minWidth: 150, flex: "1 1 140px" }}>
           <option value="all">Tous les mois</option>
           {months.map(m => <option key={m} value={m}>{MONTHS[parseInt(m.split("-")[1])-1]} {m.split("-")[0]}</option>)}
         </Select>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[{ label: "Total heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" }, { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" }].map(k => (
           <Card key={k.label} style={{ padding: "20px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 8 }}>{k.icon}</div>
@@ -519,7 +542,7 @@ function AdminDashboard({ entries, rates, budgets }) {
   return (
     <div>
       <SectionTitle sub="Vue d'ensemble du club">Dashboard</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[{ label: "Heures totales", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Coût total", value: fmt(totalCost), color: "#34d399", icon: "💶" }, { label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" }].map(k => (
           <Card key={k.label} style={{ padding: "20px 22px" }}>
             <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
@@ -559,6 +582,49 @@ function AdminDashboard({ entries, rates, budgets }) {
   );
 }
 
+// ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
+function exportExcel(entries, rates) {
+  // Build CSV content (opens in Excel)
+  const headers = ["Date", "Entraîneur", "Activité", "Catégories", "Heures", "Taux horaire (€/h)", "Coût (€)", "Note"];
+  const rows = [...entries]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map(e => [
+      new Date(e.date + "T00:00:00").toLocaleDateString("fr-FR"),
+      e.coachName,
+      e.activity,
+      e.categories && e.categories.length > 0 ? e.categories.join(", ") : "",
+      e.hours,
+      rates[e.activity] || 0,
+      (e.hours * (rates[e.activity] || 0)).toFixed(2),
+      e.note || "",
+    ]);
+
+  // Add totals row
+  const totalHours = entries.reduce((s, e) => s + e.hours, 0);
+  const totalCost = entries.reduce((s, e) => s + e.hours * (rates[e.activity] || 0), 0);
+  rows.push(["", "", "", "", "", "", "", ""]);
+  rows.push(["TOTAL", "", "", "", totalHours, "", totalCost.toFixed(2), ""]);
+
+  // Build CSV with BOM for Excel UTF-8
+  const BOM = "﻿";
+  const csvContent = BOM + [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
+    .join("
+");
+
+  // Download
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const date = new Date().toLocaleDateString("fr-FR").replace(/\//g, "-");
+  link.href = url;
+  link.download = `club-manager-rapport-${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // ─── ADMIN : RAPPORTS ─────────────────────────────────────────────────────────
 function AdminRapports({ entries, rates }) {
   const [filterCoach, setFilterCoach] = useState("all");
@@ -594,8 +660,8 @@ function AdminRapports({ entries, rates }) {
   return (
     <div>
       <SectionTitle sub="Filtrez et analysez les données">Rapports détaillés</SectionTitle>
-      <Card style={{ marginBottom: 20, padding: 20 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 16, alignItems: "flex-end" }}>
+      <Card style={{ marginBottom: 16, padding: 14 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end" }}>
           <Select label="Entraîneur" value={filterCoach} onChange={e => setFilterCoach(e.target.value)}>
             <option value="all">Tous</option>
             {coaches.map(c => <option key={c} value={c}>{c}</option>)}
@@ -616,9 +682,9 @@ function AdminRapports({ entries, rates }) {
       </Card>
 
       {/* Matrice heures */}
-      <Card style={{ marginBottom: 20, overflowX: "auto" }}>
-        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Matrice heures — Entraîneur × Activité</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+      <Card style={{ marginBottom: 16, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <h3 style={{ margin: "0 0 16px", fontSize: 14, color: "#94a3b8" }}>Matrice heures — Entraîneur × Activité</h3>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <th style={{ padding: "10px 16px", textAlign: "left", color: "#475569", fontWeight: 700 }}>Entraîneur</th>
             {actStats.map(a => <th key={a.activity} style={{ padding: "10px 12px", textAlign: "center", color: ACT_COLORS[a.activity]?.text||"#e2e8f0", fontWeight: 600 }}>{a.activity}</th>)}
@@ -704,9 +770,14 @@ function AdminRapports({ entries, rates }) {
       )}
 
       {/* Détail saisies */}
-      <Card style={{ overflowX: "auto" }}>
-        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Détail des saisies ({filtered.length})</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+      <Card style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <h3 style={{ margin: 0, fontSize: 14, color: "#94a3b8" }}>Détail des saisies ({filtered.length})</h3>
+          <button onClick={() => exportExcel(filtered, rates)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "linear-gradient(135deg,#10b981,#06b6d4)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            📥 Exporter Excel
+          </button>
+        </div>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             {["Date","Entraîneur","Activité","Catégories","Heures","Taux","Coût","Note"].map(h => <th key={h} style={{ padding: "8px 14px", textAlign: "left", color: "#334155", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>{h}</th>)}
           </tr></thead>
@@ -751,7 +822,7 @@ function AdminBudget({ entries, rates, budgets, dbOps }) {
   return (
     <div>
       <SectionTitle sub="Définissez et suivez les budgets par activité">Gestion des budgets</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[{ label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Coût engagé", value: fmt(totalCost), color: "#f87171", icon: "💶" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#34d399":"#f87171", icon: totalBudget-totalCost>=0?"✅":"⚠️" }].map(k => (
           <Card key={k.label} style={{ padding: "22px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 10 }}>{k.icon}</div>
@@ -760,7 +831,7 @@ function AdminBudget({ entries, rates, budgets, dbOps }) {
           </Card>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
         {actStats.map(a => {
           const over = a.remaining < 0;
           return (
@@ -770,7 +841,7 @@ function AdminBudget({ entries, rates, budgets, dbOps }) {
                 <div style={{ textAlign: "right" }}><div style={{ color: over?"#f87171":"#34d399", fontWeight: 800, fontSize: 20 }}>{fmt(a.remaining)}</div><div style={{ color: "#334155", fontSize: 11 }}>{over?"⚠️ Dépassement":"Restant"}</div></div>
               </div>
               <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 10, marginBottom: 12, overflow: "hidden" }}><div style={{ background: over?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
                 {[{ label: "Heures", value: `${a.hours}h`, color: "#60a5fa" }, { label: "Coût", value: fmt(a.cost), color: "#f87171" }, { label: "Budget", value: fmt(a.budget), color: "#fbbf24" }].map(s => (
                   <div key={s.label} style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: "10px 8px", textAlign: "center" }}><div style={{ color: s.color, fontWeight: 700, fontSize: 14 }}>{s.value}</div><div style={{ color: "#334155", fontSize: 10, marginTop: 2 }}>{s.label}</div></div>
                 ))}
@@ -831,7 +902,7 @@ function AdminParametres({ rates, users, dbOps }) {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: "100%", maxWidth: "100%" }}>
       <SectionTitle sub="Taux horaires, entraîneurs et mot de passe">Paramètres</SectionTitle>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>
         {/* Taux horaires */}
@@ -933,7 +1004,7 @@ function MonCompte({ user, users, dbOps }) {
     setMsg({ type:"success", text:"Mot de passe modifié avec succès !" }); setTimeout(() => setMsg(null), 3000);
   };
   return (
-    <div style={{ maxWidth: 480 }}>
+    <div style={{ maxWidth: "100%" }}>
       <SectionTitle sub="Gérez vos informations personnelles">Mon compte</SectionTitle>
       <Card style={{ marginBottom: 20 }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>👤 Informations</h3>
