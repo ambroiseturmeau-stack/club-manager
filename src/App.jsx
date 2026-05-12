@@ -232,7 +232,7 @@ function Shell({ user, tab, setTab, onLogout, children }) {
           <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9", letterSpacing: -0.2 }}>Club Manager</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : isReferent ? "⭐" : "🎿"} {user.name}</span>
+          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : isReferent ? "🎿⭐" : "🎿"} {user.name}</span>
           <button onClick={onLogout} style={{ padding: "5px 10px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Quitter</button>
         </div>
       </div>
@@ -745,7 +745,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false }) {
   const handleSaveEvent = async ({ activity, categories, hours, note }) => {
     await dbOps.addCalEvent({
       coachId: user.id,
-      coachName: user.name,
+      coachName: isAdmin ? "Admin" : user.name,
       activity,
       date: selectedDate,
       categories,
@@ -774,7 +774,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false }) {
         <div>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Calendrier</h2>
           <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 12 }}>
-            {isAdmin ? "Planning de l'équipe — Décembre à Avril" : "⭐ Référent — Cliquez sur un jour pour ajouter une activité"}
+            {isAdmin ? "Planning — Cliquez sur un jour pour ajouter une activité" : "⭐ Référent — Cliquez sur un jour pour ajouter une activité"}
           </p>
         </div>
       </div>
@@ -787,7 +787,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false }) {
             <span style={{ color: ACT_COLORS[a].text, fontSize: 11, fontWeight: 600 }}>{a}</span>
           </div>
         ))}
-        {!isAdmin && <span style={{ color: "#64748b", fontSize: 11, alignSelf: "center" }}>← Cliquez sur un jour pour ajouter</span>}
+        <span style={{ color: "#64748b", fontSize: 11, alignSelf: "center" }}>← Cliquez sur un jour pour ajouter</span>
       </div>
 
       {/* Calendriers mois par mois */}
@@ -796,7 +796,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false }) {
           key={`${ym.year}-${ym.month}`}
           yearMonth={ym}
           events={calEvents}
-          canEdit={!isAdmin}
+          canEdit={true}
           onAddEvent={handleAddEvent}
           onDeleteEvent={(date) => setDeleteDate(date)}
         />
@@ -1171,9 +1171,9 @@ function AdminParametres({ rates, users, dbOps }) {
     if (!newCoach.name||!newCoach.email||!newCoach.password) { showCoachMsg("error","Tous les champs sont obligatoires."); return; }
     if (users.find(u => u.email===newCoach.email)) { showCoachMsg("error","Email déjà utilisé."); return; }
     if (newCoach.password.length<6) { showCoachMsg("error","Mot de passe min. 6 caractères."); return; }
-    const error = await dbOps.addUser(newCoach);
+    const error = await dbOps.addUser({ ...newCoach, is_referent: newCoach.is_referent || false });
     if (error) { showCoachMsg("error","Erreur: "+error.message); return; }
-    setNewCoach({ name:"", email:"", password:"" }); setShowAddForm(false);
+    setNewCoach({ name:"", email:"", password:"", is_referent: false }); setShowAddForm(false);
     showCoachMsg("success",`Entraîneur ${newCoach.name} ajouté !`);
   };
   const handleDeleteCoach = async (id) => { await dbOps.deleteUser(id); setDeleteCoachId(null); showCoachMsg("success","Entraîneur supprimé."); };
@@ -1230,6 +1230,21 @@ function AdminParametres({ rates, users, dbOps }) {
                   <input value={newCoach.name} onChange={e => setNewCoach(p => ({...p,name:e.target.value}))} placeholder="Nom complet" style={fieldStyle} />
                   <input value={newCoach.email} onChange={e => setNewCoach(p => ({...p,email:e.target.value}))} placeholder="Email" type="email" style={fieldStyle} />
                   <input value={newCoach.password} onChange={e => setNewCoach(p => ({...p,password:e.target.value}))} placeholder="Mot de passe (6 car. min.)" type="password" style={fieldStyle} />
+                  <div>
+                    <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Rôles (cumulables)</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <span style={{ color: "#e2e8f0", fontSize: 13 }}>🎿 Entraîneur</span>
+                        <span style={{ color: "#34d399", fontSize: 11, fontWeight: 600 }}>✅ Toujours actif</span>
+                      </div>
+                      <div onClick={() => setNewCoach(p => ({...p, is_referent: !p.is_referent}))} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: (newCoach.is_referent||false) ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.03)", borderRadius: 10, border: `1px solid ${(newCoach.is_referent||false) ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.06)"}`, cursor: "pointer", userSelect: "none" }}>
+                        <span style={{ color: "#e2e8f0", fontSize: 13 }}>⭐ Référent</span>
+                        <div style={{ width: 36, height: 20, borderRadius: 99, background: (newCoach.is_referent||false) ? "#3b82f6" : "rgba(255,255,255,0.1)", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                          <div style={{ position: "absolute", top: 2, left: (newCoach.is_referent||false) ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <Btn onClick={handleAddCoach} variant="success">Ajouter</Btn>
                 </div>
               </Card>
@@ -1243,11 +1258,33 @@ function AdminParametres({ rates, users, dbOps }) {
                         <input value={editCoachData.name||""} onChange={e => setEditCoachData(p => ({...p,name:e.target.value}))} placeholder="Nom" style={fieldStyle} />
                         <input value={editCoachData.email||""} onChange={e => setEditCoachData(p => ({...p,email:e.target.value}))} placeholder="Email" style={fieldStyle} />
                         <input value={editCoachData.password||""} onChange={e => setEditCoachData(p => ({...p,password:e.target.value}))} placeholder="Nouveau mot de passe (vide = inchangé)" type="password" style={fieldStyle} />
+                        <div>
+                          <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Rôles (cumulables)</label>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.06)" }}>
+                              <span style={{ color: "#e2e8f0", fontSize: 13 }}>🎿 Entraîneur</span>
+                              <span style={{ color: "#34d399", fontSize: 11, fontWeight: 600 }}>✅ Toujours actif</span>
+                            </div>
+                            <div onClick={() => setEditCoachData(p => ({...p, is_referent: !p.is_referent}))} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: (editCoachData.is_referent||false) ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.03)", borderRadius: 10, border: `1px solid ${(editCoachData.is_referent||false) ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.06)"}`, cursor: "pointer", userSelect: "none" }}>
+                              <span style={{ color: "#e2e8f0", fontSize: 13 }}>⭐ Référent</span>
+                              <div style={{ width: 36, height: 20, borderRadius: 99, background: (editCoachData.is_referent||false) ? "#3b82f6" : "rgba(255,255,255,0.1)", position: "relative", transition: "background .2s", flexShrink: 0 }}>
+                                <div style={{ position: "absolute", top: 2, left: (editCoachData.is_referent||false) ? 18 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <div style={{ display: "flex", gap: 8 }}><Btn small variant="success" onClick={() => handleSaveCoach(c.id)}>✓ Enregistrer</Btn><Btn small variant="ghost" onClick={() => setEditCoachId(null)}>✕ Annuler</Btn></div>
                       </div>
                     ) : (
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div><div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13 }}>{c.is_referent ? "⭐" : "🎿"} {c.name} {c.is_referent && <span style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", fontSize: 10, padding: "1px 6px", borderRadius: 99, marginLeft: 4 }}>Référent</span>}</div><div style={{ color: "#334155", fontSize: 11, marginTop: 2 }}>{c.email}</div></div>
+                        <div>
+                          <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                            {c.name}
+                            <span style={{ background: "rgba(255,255,255,0.06)", color: "#94a3b8", fontSize: 10, padding: "1px 7px", borderRadius: 99 }}>🎿 Entraîneur</span>
+                            {c.is_referent && <span style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", fontSize: 10, padding: "1px 7px", borderRadius: 99 }}>⭐ Référent</span>}
+                          </div>
+                          <div style={{ color: "#334155", fontSize: 11, marginTop: 3 }}>{c.email}</div>
+                        </div>
                         <div style={{ display: "flex", gap: 6 }}><Btn small variant="ghost" onClick={() => { setEditCoachId(c.id); setEditCoachData({ name:c.name, email:c.email, password:"", is_referent: c.is_referent||false }); }}>✏️</Btn><Btn small variant="danger" onClick={() => setDeleteCoachId(c.id)}>🗑️</Btn></div>
                       </div>
                     )}
@@ -1299,7 +1336,7 @@ function MonCompte({ user, users, dbOps }) {
       <Card style={{ marginBottom: 20 }}>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>👤 Informations</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {[{ label: "Nom", value: user.name }, { label: "Email", value: user.email }, { label: "Rôle", value: "🎿 Entraîneur" }].map(f => (
+          {[{ label: "Nom", value: user.name }, { label: "Email", value: user.email }, { label: "Rôle(s)", value: user.is_referent ? "🎿 Entraîneur + ⭐ Référent" : "🎿 Entraîneur" }].map(f => (
             <div key={f.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10 }}>
               <span style={{ color: "#64748b", fontSize: 13 }}>{f.label}</span><span style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 500 }}>{f.value}</span>
             </div>
@@ -1424,7 +1461,7 @@ export default function App() {
   }, []);
 
   const addUser = useCallback(async (newUser) => {
-    const { data, error } = await supabase.from("profiles").insert({ name: newUser.name, email: newUser.email, password: newUser.password, role: "coach" }).select().single();
+    const { data, error } = await supabase.from("profiles").insert({ name: newUser.name, email: newUser.email, password: newUser.password, role: "coach", is_referent: newUser.is_referent || false }).select().single();
     if (!error && data) setUsers(prev => [...prev, data]);
     return error;
   }, []);
