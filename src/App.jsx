@@ -18,6 +18,14 @@ const getFirstDay = (y, m) => { const d = new Date(y, m, 1).getDay(); return d =
 const fmt = (n) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(n);
 const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
 const DAYS = ["L","M","M","J","V","S","D"];
+const CALENDAR_MONTHS = [
+  { year: 2025, month: 11 }, // Décembre 2025
+  { year: 2026, month: 0  }, // Janvier 2026
+  { year: 2026, month: 1  }, // Février 2026
+  { year: 2026, month: 2  }, // Mars 2026
+  { year: 2026, month: 3  }, // Avril 2026
+];
+
 const ACT_COLORS = {
   "Entraînement":  { bg: "rgba(59,130,246,0.15)",  text: "#60a5fa", bar: "#3b82f6" },
   "Fartage":       { bg: "rgba(16,185,129,0.15)",  text: "#34d399", bar: "#10b981" },
@@ -205,8 +213,14 @@ function LoginScreen({ onLogin, users }) {
 // ─── SHELL ────────────────────────────────────────────────────────────────────
 function Shell({ user, tab, setTab, onLogout, children }) {
   const isAdmin = user.role === "admin";
-  const coachTabs = [["saisie","✏️","Saisie"],["rapport","📊","Rapport"],["compte","👤","Compte"]];
-  const adminTabs = [["dashboard","🏠","Dashboard"],["rapports","📈","Rapports"],["budget","💰","Budgets"],["parametres","⚙️","Params"]];
+  const isReferent = user.role === "referent" || user.is_referent === true;
+  const coachTabs = [
+    ["saisie","✏️","Saisie"],
+    ["rapport","📊","Rapport"],
+    ...(isReferent ? [["calendrier","📅","Calendrier"]] : []),
+    ["compte","👤","Compte"],
+  ];
+  const adminTabs = [["dashboard","🏠","Dashboard"],["rapports","📈","Rapports"],["budget","💰","Budgets"],["calendrier","📅","Calendrier"],["parametres","⚙️","Params"]];
   const tabs = isAdmin ? adminTabs : coachTabs;
   return (
     <div style={{ minHeight: "100vh", background: "#080d14", fontFamily: "'Sora', sans-serif", color: "#e2e8f0", display: "flex", flexDirection: "column" }}>
@@ -218,7 +232,7 @@ function Shell({ user, tab, setTab, onLogout, children }) {
           <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9", letterSpacing: -0.2 }}>Club Manager</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : "🎿"} {user.name}</span>
+          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : isReferent ? "⭐" : "🎿"} {user.name}</span>
           <button onClick={onLogout} style={{ padding: "5px 10px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Quitter</button>
         </div>
       </div>
@@ -433,103 +447,88 @@ function CoachRapport({ user, entries, dbOps }) {
   return (
     <div>
       <SectionTitle sub="Visualisez vos heures par activité">Mon rapport d'activité</SectionTitle>
-
-      {/* Filtre mois */}
-      <div style={{ marginBottom: 16 }}>
-        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} style={{ minWidth: 150, flex: "1 1 140px" }}>
           <option value="all">Tous les mois</option>
           {months.map(m => <option key={m} value={m}>{MONTHS[parseInt(m.split("-")[1])-1]} {m.split("-")[0]}</option>)}
         </Select>
       </div>
 
-      {/* KPIs 3 col compactes */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 14 }}>
-        {[
-          { label: "Heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" },
-          { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" },
-          { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" },
-        ].map(k => (
-          <Card key={k.label} style={{ padding: "12px 10px", textAlign: "center" }}>
-            <div style={{ fontSize: 20, marginBottom: 4 }}>{k.icon}</div>
-            <div style={{ color: k.color, fontWeight: 800, fontSize: 22 }}>{k.value}</div>
-            <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>{k.label}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 20 }}>
+        {[{ label: "Total heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" }, { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" }].map(k => (
+          <Card key={k.label} style={{ padding: "20px 24px", textAlign: "center" }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>{k.icon}</div>
+            <div style={{ color: k.color, fontWeight: 800, fontSize: 28 }}>{k.value}</div>
+            <div style={{ color: "#475569", fontSize: 12, marginTop: 4 }}>{k.label}</div>
           </Card>
         ))}
       </div>
 
-      {/* Heures par activité — pleine largeur */}
-      <Card style={{ marginBottom: 12 }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 14, color: "#94a3b8" }}>Heures par activité</h3>
-        {byActivity.length === 0 && <p style={{ color: "#334155", fontSize: 13 }}>Aucune donnée</p>}
-        {byActivity.map(a => (
-          <div key={a.activity} style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <Badge activity={a.activity} />
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <span style={{ color: "#94a3b8", fontSize: 11 }}>{a.count} séance{a.count>1?"s":""}</span>
-                <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{a.hours}h</span>
-                <span style={{ color: "#64748b", fontSize: 11 }}>{Math.round((a.hours/totalHours)*100)}%</span>
-              </div>
-            </div>
-            <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 7 }}>
-              <div style={{ background: ACT_COLORS[a.activity]?.bar || "#3b82f6", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} />
-            </div>
-            {a.hasCategories && a.byCategory.length > 0 && (
-              <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: "2px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 5 }}>
-                {a.byCategory.map(c => (
-                  <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c.cat}</span>
-                    <span style={{ color: "#64748b", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </Card>
-
-      {/* Historique — pleine largeur */}
-      <Card>
-        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>Historique des saisies</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
-            <div key={e.id}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 4 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                    <Badge activity={e.activity} />
-                    {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 7px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c}</span>)}
-                    {e.note && <span style={{ color: "#334155", fontSize: 11 }}>{e.note}</span>}
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0, marginLeft: 8 }}>
-                  {editHoursId === e.id ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 6, padding: "3px 6px", color: "#e2e8f0", fontSize: 12, fontFamily: "inherit" }}>
-                        {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
-                      </select>
-                      <Btn small variant="success" onClick={() => handleSaveHours(e.id)}>✓</Btn>
-                      <Btn small variant="ghost" onClick={() => setEditHoursId(null)}>✕</Btn>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <Card>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par activité</h3>
+          {byActivity.length === 0 && <p style={{ color: "#334155", fontSize: 13 }}>Aucune donnée</p>}
+          {byActivity.map(a => (
+            <div key={a.activity} style={{ marginBottom: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><Badge activity={a.activity} /><span style={{ color: "#e2e8f0", fontWeight: 700 }}>{a.hours}h</span></div>
+              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 6 }}><div style={{ background: ACT_COLORS[a.activity]?.bar || "#3b82f6", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} /></div>
+              <div style={{ color: "#334155", fontSize: 11, marginTop: 4 }}>{a.count} séance{a.count>1?"s":""} — {Math.round((a.hours/totalHours)*100)}%</div>
+              {a.hasCategories && a.byCategory.length > 0 && (
+                <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: "2px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 4 }}>
+                  {a.byCategory.map(c => (
+                    <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c.cat}</span>
+                      <span style={{ color: "#64748b", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
                     </div>
-                  ) : <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 15 }}>{e.hours}h</span>}
-                  <Btn small variant="ghost" onClick={() => handleEditHours(e.id)}>✏️</Btn>
-                  <Btn small variant="danger" onClick={() => setDeleteId(e.id)}>🗑️</Btn>
-                </div>
-              </div>
-              {deleteId === e.id && (
-                <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 12px", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                  <span style={{ color: "#f87171", fontSize: 12 }}>⚠️ Supprimer ?</span>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <Btn small variant="danger" onClick={() => handleDelete(e.id)}>Supprimer</Btn>
-                    <Btn small variant="ghost" onClick={() => setDeleteId(null)}>Annuler</Btn>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
           ))}
-        </div>
-      </Card>
+        </Card>
+
+        <Card>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Historique des saisies</h3>
+          <div style={{ maxHeight: 420, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+            {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
+              <div key={e.id}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: "#475569", marginBottom: 3 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <Badge activity={e.activity} />
+                      {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
+                      {e.note && <span style={{ color: "#334155", fontSize: 11 }}>{e.note}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {editHoursId === e.id ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 6, padding: "3px 6px", color: "#e2e8f0", fontSize: 12, fontFamily: "inherit" }}>
+                          {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
+                        </select>
+                        <Btn small variant="success" onClick={() => handleSaveHours(e.id)}>✓</Btn>
+                        <Btn small variant="ghost" onClick={() => setEditHoursId(null)}>✕</Btn>
+                      </div>
+                    ) : <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 16 }}>{e.hours}h</span>}
+                    <Btn small variant="ghost" onClick={() => handleEditHours(e.id)}>✏️</Btn>
+                    <Btn small variant="danger" onClick={() => setDeleteId(e.id)}>🗑️</Btn>
+                  </div>
+                </div>
+                {deleteId === e.id && (
+                  <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ color: "#f87171", fontSize: 13 }}>⚠️ Confirmer la suppression ?</span>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <Btn small variant="danger" onClick={() => handleDelete(e.id)}>Supprimer</Btn>
+                      <Btn small variant="ghost" onClick={() => setDeleteId(null)}>Annuler</Btn>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -556,73 +555,323 @@ function AdminDashboard({ entries, rates, budgets }) {
 
   return (
     <div>
-      <SectionTitle sub="Vue d ensemble du club">Dashboard</SectionTitle>
-
-      {/* KPIs 2x2 sur mobile */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
-        {[
-          { label: "Heures totales", value: `${totalHours}h`,           color: "#60a5fa", icon: "⏱️" },
-          { label: "Coût total",     value: fmt(totalCost),             color: "#34d399", icon: "💶" },
-          { label: "Budget total",   value: fmt(totalBudget),           color: "#fbbf24", icon: "🏦" },
-          { label: "Restant",        value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" },
-        ].map(k => (
-          <Card key={k.label} style={{ padding: "12px 14px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
-              <span style={{ fontSize: 16 }}>{k.icon}</span>
-              <span style={{ color: "#64748b", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{k.label}</span>
-            </div>
-            <div style={{ color: k.color, fontWeight: 800, fontSize: 20 }}>{k.value}</div>
+      <SectionTitle sub="Vue d'ensemble du club">Dashboard</SectionTitle>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
+        {[{ label: "Heures totales", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Coût total", value: fmt(totalCost), color: "#34d399", icon: "💶" }, { label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" }].map(k => (
+          <Card key={k.label} style={{ padding: "20px 22px" }}>
+            <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
+            <div style={{ color: k.color, fontWeight: 800, fontSize: 22 }}>{k.value}</div>
+            <div style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 600, marginTop: 4 }}>{k.label}</div>
           </Card>
         ))}
       </div>
-
-      {/* Entraîneurs — pleine largeur */}
-      <Card style={{ marginBottom: 12 }}>
-        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>🎿 Heures par entraîneur</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <Card>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par entraîneur</h3>
           {coachStats.map(c => (
-            <div key={c.name}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: "#e2e8f0", fontWeight: 500 }}>{c.name}</span>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <span style={{ color: "#60a5fa", fontWeight: 700, fontSize: 14 }}>{c.hours}h</span>
-                  <span style={{ color: "#34d399", fontWeight: 600, fontSize: 13 }}>{fmt(c.cost)}</span>
-                </div>
+            <div key={c.name} style={{ marginBottom: 18 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 14 }}>🎿 {c.name}</span>
+                <div style={{ display: "flex", gap: 16 }}><span style={{ color: "#60a5fa", fontWeight: 700 }}>{c.hours}h</span><span style={{ color: "#34d399", fontWeight: 700 }}>{fmt(c.cost)}</span></div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 7 }}>
-                <div style={{ background: "linear-gradient(90deg,#f59e0b,#ef4444)", height: "100%", borderRadius: 99, width: `${coachStats.length && Math.max(...coachStats.map(x=>x.hours))>0 ? (c.hours/Math.max(...coachStats.map(x=>x.hours)))*100 : 0}%`, transition: "width .4s" }} />
-              </div>
+              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 6 }}><div style={{ background: "linear-gradient(90deg,#f59e0b,#ef4444)", height: "100%", borderRadius: 99, width: `${totalHours?(c.hours/Math.max(...coachStats.map(x=>x.hours)))*100:0}%` }} /></div>
             </div>
           ))}
-        </div>
-      </Card>
+        </Card>
+        <Card>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Budget par activité</h3>
+          {actStats.map(a => (
+            <div key={a.activity} style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
+                <Badge activity={a.activity} />
+                <span style={{ color: a.remaining>=0?"#34d399":"#f87171", fontWeight: 700, fontSize: 13 }}>{fmt(a.remaining)}{a.remaining<0?" ⚠️":""}</span>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 8, overflow: "hidden" }}><div style={{ background: a.remaining<0?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.cost)} dépensé</span><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.budget)} budget</span></div>
+            </div>
+          ))}
+        </Card>
+      </div>
+    </div>
+  );
+}
 
-      {/* Budget activités — pleine largeur */}
-      <Card>
-        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>💰 Budget par activité</h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {actStats.map(a => {
-            const over = a.remaining < 0;
+// ─── CALENDRIER COMPOSANTS ───────────────────────────────────────────────────
+
+// Mini calendar month view for the planning
+function CalMois({ yearMonth, events, canEdit, onAddEvent, onDeleteEvent }) {
+  const { year, month } = yearMonth;
+  const days = getDaysInMonth(year, month);
+  const first = getFirstDay(year, month);
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
+      {/* Header mois */}
+      <div style={{ background: "rgba(59,130,246,0.12)", padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#60a5fa" }}>{MONTHS[month]} {year}</span>
+      </div>
+      {/* Grille jours */}
+      <div style={{ padding: 12 }}>
+        {/* Entêtes */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
+          {["L","M","M","J","V","S","D"].map((d,i) => (
+            <div key={i} style={{ textAlign: "center", fontSize: 10, color: "#334155", fontWeight: 700, padding: "2px 0" }}>{d}</div>
+          ))}
+        </div>
+        {/* Jours */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+          {Array(first).fill(null).map((_, i) => <div key={"e"+i} />)}
+          {Array(days).fill(null).map((_, i) => {
+            const day = i + 1;
+            const ds = `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+            const dayEvents = events.filter(e => e.date === ds);
+            const isToday = ds === today;
+            const hasEntr = dayEvents.some(e => e.activity === "Entraînement");
+            const hasCourse = dayEvents.some(e => e.activity === "Course");
             return (
-              <div key={a.activity}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <Badge activity={a.activity} />
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ color: over?"#f87171":"#34d399", fontWeight: 700, fontSize: 14 }}>{fmt(a.remaining)}{over?" ⚠️":""}</div>
-                    <div style={{ color: "#334155", fontSize: 10, marginTop: 1 }}>{fmt(a.cost)} / {fmt(a.budget)}</div>
-                  </div>
-                </div>
-                <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 8, overflow: "hidden" }}>
-                  <div style={{ background: over?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%`, transition: "width .4s" }} />
-                </div>
+              <div key={day} style={{ minHeight: 44, borderRadius: 6, background: isToday ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.02)", border: isToday ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent", padding: "3px", cursor: canEdit ? "pointer" : "default", position: "relative" }}
+                onClick={() => canEdit && onAddEvent(ds)}>
+                <div style={{ fontSize: 11, fontWeight: isToday ? 700 : 400, color: isToday ? "#60a5fa" : "#94a3b8", marginBottom: 2, textAlign: "right", paddingRight: 2 }}>{day}</div>
+                {hasEntr && <div style={{ background: ACT_COLORS["Entraînement"].bg, borderLeft: `2px solid ${ACT_COLORS["Entraînement"].bar}`, borderRadius: 3, padding: "1px 4px", fontSize: 9, color: ACT_COLORS["Entraînement"].text, fontWeight: 600, marginBottom: 1, lineHeight: 1.4 }}>
+                  Entr. {dayEvents.filter(e=>e.activity==="Entraînement").map(e=>e.categories?.join(",")).join(" / ")}
+                </div>}
+                {hasCourse && <div style={{ background: ACT_COLORS["Course"].bg, borderLeft: `2px solid ${ACT_COLORS["Course"].bar}`, borderRadius: 3, padding: "1px 4px", fontSize: 9, color: ACT_COLORS["Course"].text, fontWeight: 600, lineHeight: 1.4 }}>
+                  Course {dayEvents.filter(e=>e.activity==="Course").map(e=>e.categories?.join(",")).join(" / ")}
+                </div>}
+                {canEdit && dayEvents.length > 0 && (
+                  <div style={{ position: "absolute", top: 2, left: 2, cursor: "pointer", fontSize: 9, color: "#ef4444", fontWeight: 700 }}
+                    onClick={ev => { ev.stopPropagation(); onDeleteEvent(ds); }}>✕</div>
+                )}
               </div>
             );
           })}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
+
+// Modal pour ajouter un événement au calendrier
+function AddEventModal({ date, onSave, onClose }) {
+  const [activity, setActivity] = useState("Entraînement");
+  const [categories, setCategories] = useState([]);
+  const [note, setNote] = useState("");
+  const [hours, setHours] = useState("2");
+  const isCourse = activity === "Course";
+  const needCats = true; // both need categories
+
+  const toggleCat = (c) => setCategories(p => p.includes(c) ? p.filter(x=>x!==c) : [...p, c]);
+  const canSave = categories.length > 0 && (!isCourse || note.trim().length > 0) && hours;
+
+  const fStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
+      <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 400 }}>
+        <h3 style={{ margin: "0 0 4px", fontSize: 16, color: "#f1f5f9" }}>Ajouter une activité</h3>
+        <p style={{ margin: "0 0 20px", color: "#64748b", fontSize: 12 }}>
+          {new Date(date+"T00:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Activité */}
+          <div>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Activité</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["Entraînement","Course"].map(a => (
+                <div key={a} onClick={() => { setActivity(a); setCategories([]); }} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: 10, cursor: "pointer", border: `2px solid ${activity===a ? ACT_COLORS[a].bar : "rgba(255,255,255,0.08)"}`, background: activity===a ? ACT_COLORS[a].bg : "rgba(255,255,255,0.02)", color: activity===a ? ACT_COLORS[a].text : "#475569", fontWeight: activity===a ? 700 : 400, fontSize: 13, userSelect: "none" }}>{a}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* Catégories obligatoires */}
+          <div>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>
+              Catégories <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(65px, 1fr))", gap: 6 }}>
+              {CATEGORIES.map(cat => {
+                const sel = categories.includes(cat);
+                return <div key={cat} onClick={() => toggleCat(cat)} style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.02)", color: sel ? "#60a5fa" : "#475569", fontSize: 12, fontWeight: sel ? 700 : 400, userSelect: "none" }}>{cat}</div>;
+              })}
+            </div>
+            {categories.length === 0 && <p style={{ color: "#f87171", fontSize: 11, margin: "5px 0 0" }}>⚠️ Sélectionnez au moins une catégorie</p>}
+          </div>
+
+          {/* Heures */}
+          <div>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Heures <span style={{ color: "#ef4444" }}>*</span></label>
+            <select value={hours} onChange={e => setHours(e.target.value)} style={fStyle}>
+              {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
+            </select>
+          </div>
+
+          {/* Note obligatoire pour Course */}
+          {isCourse && (
+            <div>
+              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>
+                Note course <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ex: Slalom géant, départ 9h..." style={fStyle} />
+              {isCourse && !note.trim() && <p style={{ color: "#f87171", fontSize: 11, margin: "5px 0 0" }}>⚠️ Note obligatoire pour une course</p>}
+            </div>
+          )}
+
+          {/* Boutons */}
+          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+            <Btn onClick={() => onSave({ activity, categories, hours: parseInt(hours), note })} disabled={!canSave} style={{ flex: 1 }}>
+              Ajouter
+            </Btn>
+            <Btn variant="ghost" onClick={onClose}>Annuler</Btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Composant principal Calendrier (coach référent + admin)
+function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false }) {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [deleteDate, setDeleteDate] = useState(null);
+
+  const handleAddEvent = (date) => {
+    setSelectedDate(date);
+    setShowModal(true);
+  };
+
+  const handleSaveEvent = async ({ activity, categories, hours, note }) => {
+    await dbOps.addCalEvent({
+      coachId: user.id,
+      coachName: user.name,
+      activity,
+      date: selectedDate,
+      categories,
+      hours,
+      note,
+    });
+    setShowModal(false);
+    setSelectedDate(null);
+  };
+
+  const handleDeleteDay = async (date) => {
+    const toDelete = calEvents.filter(e => e.date === date);
+    for (const e of toDelete) await dbOps.deleteCalEvent(e.id);
+    setDeleteDate(null);
+  };
+
+  // Stats pour admin
+  const totalEntrHours = calEvents.filter(e => e.activity === "Entraînement").reduce((s,e) => s+e.hours, 0);
+  const totalCourseHours = calEvents.filter(e => e.activity === "Course").reduce((s,e) => s+e.hours, 0);
+  const costEntr = totalEntrHours * (rates?.["Entraînement"] || 0);
+  const costCourse = totalCourseHours * (rates?.["Course"] || 0);
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Calendrier</h2>
+          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 12 }}>
+            {isAdmin ? "Planning de l'équipe — Décembre à Avril" : "⭐ Référent — Cliquez sur un jour pour ajouter une activité"}
+          </p>
+        </div>
+      </div>
+
+      {/* Légende */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+        {["Entraînement","Course"].map(a => (
+          <div key={a} style={{ display: "flex", alignItems: "center", gap: 6, background: ACT_COLORS[a].bg, border: `1px solid ${ACT_COLORS[a].bar}`, borderRadius: 99, padding: "4px 10px" }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: ACT_COLORS[a].bar }} />
+            <span style={{ color: ACT_COLORS[a].text, fontSize: 11, fontWeight: 600 }}>{a}</span>
+          </div>
+        ))}
+        {!isAdmin && <span style={{ color: "#64748b", fontSize: 11, alignSelf: "center" }}>← Cliquez sur un jour pour ajouter</span>}
+      </div>
+
+      {/* Calendriers mois par mois */}
+      {CALENDAR_MONTHS.map(ym => (
+        <CalMois
+          key={`${ym.year}-${ym.month}`}
+          yearMonth={ym}
+          events={calEvents}
+          canEdit={!isAdmin}
+          onAddEvent={handleAddEvent}
+          onDeleteEvent={(date) => setDeleteDate(date)}
+        />
+      ))}
+
+      {/* Confirmation suppression */}
+      {deleteDate && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
+          <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 340, textAlign: "center" }}>
+            <p style={{ color: "#f87171", fontSize: 14, marginBottom: 16 }}>⚠️ Supprimer toutes les activités du {new Date(deleteDate+"T00:00:00").toLocaleDateString("fr-FR")} ?</p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <Btn variant="danger" onClick={() => handleDeleteDay(deleteDate)}>Supprimer</Btn>
+              <Btn variant="ghost" onClick={() => setDeleteDate(null)}>Annuler</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal ajout */}
+      {showModal && selectedDate && (
+        <AddEventModal date={selectedDate} onSave={handleSaveEvent} onClose={() => { setShowModal(false); setSelectedDate(null); }} />
+      )}
+
+      {/* Résumé coûts — admin seulement */}
+      {isAdmin && (
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#94a3b8" }}>💰 Coûts planifiés</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {[
+              { label: "Entraînements", hours: totalEntrHours, cost: costEntr, color: ACT_COLORS["Entraînement"].text, bg: ACT_COLORS["Entraînement"].bg },
+              { label: "Courses",       hours: totalCourseHours, cost: costCourse, color: ACT_COLORS["Course"].text, bg: ACT_COLORS["Course"].bg },
+            ].map(s => (
+              <div key={s.label} style={{ background: s.bg, border: `1px solid rgba(255,255,255,0.06)`, borderRadius: 12, padding: "14px 16px" }}>
+                <div style={{ color: s.color, fontWeight: 700, fontSize: 13, marginBottom: 6 }}>{s.label}</div>
+                <div style={{ color: "#f1f5f9", fontWeight: 800, fontSize: 20 }}>{fmt(s.cost)}</div>
+                <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>{s.hours}h planifiées</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "14px 16px", marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#94a3b8", fontSize: 13 }}>Coût total planifié</span>
+            <span style={{ color: "#34d399", fontWeight: 800, fontSize: 20 }}>{fmt(costEntr + costCourse)}</span>
+          </div>
+          {/* Détail par entraîneur */}
+          {calEvents.length > 0 && (() => {
+            const byCoach = [...new Set(calEvents.map(e => e.coachName))].map(name => {
+              const ces = calEvents.filter(e => e.coachName === name);
+              return {
+                name,
+                entr: ces.filter(e=>e.activity==="Entraînement").reduce((s,e)=>s+e.hours,0),
+                course: ces.filter(e=>e.activity==="Course").reduce((s,e)=>s+e.hours,0),
+              };
+            });
+            return (
+              <div style={{ marginTop: 14 }}>
+                <h4 style={{ margin: "0 0 10px", fontSize: 13, color: "#64748b" }}>Détail par référent</h4>
+                {byCoach.map(c => (
+                  <div key={c.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 8, marginBottom: 6 }}>
+                    <span style={{ color: "#e2e8f0", fontSize: 13 }}>⭐ {c.name}</span>
+                    <div style={{ display: "flex", gap: 12 }}>
+                      <span style={{ color: ACT_COLORS["Entraînement"].text, fontSize: 12 }}>Entr: {c.entr}h</span>
+                      <span style={{ color: ACT_COLORS["Course"].text, fontSize: 12 }}>Course: {c.course}h</span>
+                      <span style={{ color: "#34d399", fontWeight: 600, fontSize: 12 }}>{fmt((c.entr*(rates?.["Entraînement"]||0))+(c.course*(rates?.["Course"]||0)))}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 // ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
 function exportExcel(entries, rates) {
@@ -998,8 +1247,8 @@ function AdminParametres({ rates, users, dbOps }) {
                       </div>
                     ) : (
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div><div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13 }}>🎿 {c.name}</div><div style={{ color: "#334155", fontSize: 11, marginTop: 2 }}>{c.email}</div></div>
-                        <div style={{ display: "flex", gap: 6 }}><Btn small variant="ghost" onClick={() => { setEditCoachId(c.id); setEditCoachData({ name:c.name, email:c.email, password:"" }); }}>✏️</Btn><Btn small variant="danger" onClick={() => setDeleteCoachId(c.id)}>🗑️</Btn></div>
+                        <div><div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13 }}>{c.is_referent ? "⭐" : "🎿"} {c.name} {c.is_referent && <span style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", fontSize: 10, padding: "1px 6px", borderRadius: 99, marginLeft: 4 }}>Référent</span>}</div><div style={{ color: "#334155", fontSize: 11, marginTop: 2 }}>{c.email}</div></div>
+                        <div style={{ display: "flex", gap: 6 }}><Btn small variant="ghost" onClick={() => { setEditCoachId(c.id); setEditCoachData({ name:c.name, email:c.email, password:"", is_referent: c.is_referent||false }); }}>✏️</Btn><Btn small variant="danger" onClick={() => setDeleteCoachId(c.id)}>🗑️</Btn></div>
                       </div>
                     )}
                   </Card>
@@ -1183,6 +1432,7 @@ export default function App() {
   const updateUser = useCallback(async (id, updates) => {
     const payload = { name: updates.name, email: updates.email };
     if (updates.password) payload.password = updates.password;
+    if (updates.is_referent !== undefined) payload.is_referent = updates.is_referent;
     await supabase.from("profiles").update(payload).eq("id", id);
     setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
   }, []);
@@ -1192,7 +1442,29 @@ export default function App() {
     setUsers(prev => prev.filter(u => u.id !== id));
   }, []);
 
-  const dbOps = { addEntry, updateEntry, deleteEntry, updateRate, updateBudget, addUser, updateUser, deleteUser };
+  // ── Cal events state ──
+  const [calEvents, setCalEvents] = useState([]);
+
+  // Load cal events
+  useEffect(() => {
+    const loadCalEvents = async () => {
+      const { data } = await supabase.from("cal_events").select("*").order("date");
+      if (data) setCalEvents(data.map(e => ({ id: e.id, coachId: e.coach_id, coachName: e.coach_name, activity: e.activity, date: e.date, categories: e.categories || [], hours: e.hours || 2, note: e.note || "" })));
+    };
+    loadCalEvents();
+  }, []);
+
+  const addCalEvent = useCallback(async (ev) => {
+    const { data, error } = await supabase.from("cal_events").insert({ coach_id: ev.coachId, coach_name: ev.coachName, activity: ev.activity, date: ev.date, categories: ev.categories || [], hours: ev.hours || 2, note: ev.note || "" }).select().single();
+    if (!error && data) setCalEvents(prev => [...prev, { id: data.id, coachId: data.coach_id, coachName: data.coach_name, activity: data.activity, date: data.date, categories: data.categories || [], hours: data.hours, note: data.note || "" }]);
+  }, []);
+
+  const deleteCalEvent = useCallback(async (id) => {
+    await supabase.from("cal_events").delete().eq("id", id);
+    setCalEvents(prev => prev.filter(e => e.id !== id));
+  }, []);
+
+  const dbOps = { addEntry, updateEntry, deleteEntry, updateRate, updateBudget, addUser, updateUser, deleteUser, addCalEvent, deleteCalEvent };
 
   // ── Écrans chargement/erreur ──
   if (loading) return (
@@ -1221,14 +1493,17 @@ export default function App() {
   if (!user) return <LoginScreen onLogin={handleLogin} users={users} />;
 
   const renderTab = () => {
+    const isReferent = user.is_referent === true;
     if (user.role === "coach") {
       if (tab === "saisie") return <CoachSaisie user={user} entries={entries} dbOps={dbOps} />;
       if (tab === "rapport") return <CoachRapport user={user} entries={entries} dbOps={dbOps} />;
+      if (tab === "calendrier" && isReferent) return <CalendrierView user={user} calEvents={calEvents} dbOps={dbOps} rates={rates} isAdmin={false} />;
       if (tab === "compte") return <MonCompte user={user} users={users} dbOps={dbOps} />;
     } else {
       if (tab === "dashboard") return <AdminDashboard entries={entries} rates={rates} budgets={budgets} />;
       if (tab === "rapports") return <AdminRapports entries={entries} rates={rates} />;
       if (tab === "budget") return <AdminBudget entries={entries} rates={rates} budgets={budgets} dbOps={dbOps} />;
+      if (tab === "calendrier") return <CalendrierView user={user} calEvents={calEvents} dbOps={dbOps} rates={rates} isAdmin={true} />;
       if (tab === "parametres") return <AdminParametres rates={rates} users={users} dbOps={dbOps} />;
     }
     return null;
