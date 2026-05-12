@@ -19,52 +19,52 @@ const fmt = (n) => new Intl.NumberFormat("fr-FR", { style: "currency", currency:
 const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
 const DAYS = ["L","M","M","J","V","S","D"];
 const ACT_COLORS = {
-  "Entraînement":  { bg: "rgba(59,130,246,0.15)",  text: "#60a5fa", bar: "#3b82f6" },
-  "Fartage":       { bg: "rgba(16,185,129,0.15)",  text: "#34d399", bar: "#10b981" },
-  "Course":        { bg: "rgba(245,158,11,0.15)",  text: "#fbbf24", bar: "#f59e0b" },
-  "Administration":{ bg: "rgba(168,85,247,0.15)",  text: "#c084fc", bar: "#a855f7" },
+  "Entraînement":  { bg: "rgba(200,87,77,0.15)",  text: "#EA925E", bar: "#C8574D" },
+  "Fartage":       { bg: "rgba(16,185,129,0.15)",  text: "#F0C49A", bar: "#EA925E" },
+  "Course":        { bg: "rgba(245,158,11,0.15)",  text: "#EA925E", bar: "#C8574D" },
+  "Administration":{ bg: "rgba(168,85,247,0.15)",  text: "#EA925E", bar: "#B13026" },
 };
 
 // ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
 function Badge({ activity }) {
-  const c = ACT_COLORS[activity] || { bg: "rgba(255,255,255,0.1)", text: "#e2e8f0" };
+  const c = ACT_COLORS[activity] || { bg: "rgba(255,255,255,0.1)", text: "#F5DDD5" };
   return <span style={{ background: c.bg, color: c.text, padding: "3px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>{activity}</span>;
 }
 function Card({ children, style = {} }) {
-  return <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 18, ...style }}>{children}</div>;
+  return <div style={{ background: "#1C0D0B", border: "1px solid rgba(234,146,94,0.12)", borderRadius: 16, padding: 18, ...style }}>{children}</div>;
 }
 function Btn({ children, onClick, variant = "primary", disabled = false, small = false, style = {} }) {
   const base = { border: "none", borderRadius: 10, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "all .15s", opacity: disabled ? 0.5 : 1, ...style };
   const sizes = small ? { padding: "7px 14px", fontSize: 12 } : { padding: "12px 20px", fontSize: 14 };
   const variants = {
-    primary: { background: "linear-gradient(135deg,#3b82f6,#06b6d4)", color: "#fff" },
-    danger:  { background: "linear-gradient(135deg,#ef4444,#f97316)", color: "#fff" },
-    ghost:   { background: "rgba(255,255,255,0.06)", color: "#94a3b8" },
-    success: { background: "linear-gradient(135deg,#10b981,#06b6d4)", color: "#fff" },
+    primary: { background: "linear-gradient(135deg,#C8574D,#B13026)", color: "#fff" },
+    danger:  { background: "linear-gradient(135deg,#84181C,#560905)", color: "#fff" },
+    ghost:   { background: "rgba(86,9,5,0.3)", color: "#C8836A" },
+    success: { background: "linear-gradient(135deg,#EA925E,#C8574D)", color: "#fff" },
   };
   return <button onClick={disabled ? undefined : onClick} style={{ ...base, ...sizes, ...variants[variant] }}>{children}</button>;
 }
 function Input({ label, ...props }) {
   return (
     <div>
-      {label && <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>}
-      <input {...props} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit", ...props.style }} />
+      {label && <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>}
+      <input {...props} style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit", ...props.style }} />
     </div>
   );
 }
 function Select({ label, children, ...props }) {
   return (
     <div>
-      {label && <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>}
-      <select {...props} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit", ...props.style }}>{children}</select>
+      {label && <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>}
+      <select {...props} style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit", ...props.style }}>{children}</select>
     </div>
   );
 }
 function SectionTitle({ children, sub }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#f1f5f9", letterSpacing: -0.3 }}>{children}</h2>
-      {sub && <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>{sub}</p>}
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#FBF0EC", letterSpacing: -0.3 }}>{children}</h2>
+      {sub && <p style={{ margin: "4px 0 0", color: "#7A4035", fontSize: 13 }}>{sub}</p>}
     </div>
   );
 }
@@ -80,14 +80,14 @@ function CalendarPicker({ selected, onSelect, markedDates = [] }) {
   const prev = () => m === 0 ? (setM(11), setY(v => v-1)) : setM(v => v-1);
   const next = () => m === 11 ? (setM(0), setY(v => v+1)) : setM(v => v+1);
   return (
-    <div style={{ background: "#0f1724", padding: 20, userSelect: "none" }}>
+    <div style={{ background: "#180C0A", padding: 20, userSelect: "none" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <button onClick={prev} style={{ background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#64748b", cursor: "pointer", fontSize: 16 }}>&#8249;</button>
-        <span style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14 }}>{MONTHS[m]} {y}</span>
-        <button onClick={next} style={{ background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#64748b", cursor: "pointer", fontSize: 16 }}>&#8250;</button>
+        <button onClick={prev} style={{ background: "rgba(86,9,5,0.25)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#7A4035", cursor: "pointer", fontSize: 16 }}>&#8249;</button>
+        <span style={{ color: "#F5DDD5", fontWeight: 600, fontSize: 14 }}>{MONTHS[m]} {y}</span>
+        <button onClick={next} style={{ background: "rgba(86,9,5,0.25)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#7A4035", cursor: "pointer", fontSize: 16 }}>&#8250;</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 6 }}>
-        {DAYS.map((d, i) => <div key={i} style={{ textAlign: "center", color: "#334155", fontSize: 10, fontWeight: 800 }}>{d}</div>)}
+        {DAYS.map((d, i) => <div key={i} style={{ textAlign: "center", color: "#4A1E18", fontSize: 10, fontWeight: 800 }}>{d}</div>)}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
         {Array(first).fill(null).map((_, i) => <div key={"e"+i} />)}
@@ -96,9 +96,9 @@ function CalendarPicker({ selected, onSelect, markedDates = [] }) {
           const ds = y+"-"+String(m+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
           const isSel = selected === ds, isToday = ds === todayStr, hasEntry = markedDates.includes(ds);
           return (
-            <div key={day} onClick={() => onSelect(ds)} style={{ textAlign: "center", padding: "6px 2px", borderRadius: 8, cursor: "pointer", fontSize: 12, background: isSel ? "linear-gradient(135deg,#3b82f6,#06b6d4)" : isToday ? "rgba(59,130,246,0.12)" : "transparent", color: isSel ? "#fff" : isToday ? "#60a5fa" : "#94a3b8", fontWeight: isSel||isToday ? 700 : 400, border: isToday&&!isSel ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent", position: "relative" }}>
+            <div key={day} onClick={() => onSelect(ds)} style={{ textAlign: "center", padding: "6px 2px", borderRadius: 8, cursor: "pointer", fontSize: 12, background: isSel ? "linear-gradient(135deg,#C8574D,#84181C)" : isToday ? "rgba(176,48,38,0.12)" : "transparent", color: isSel ? "#fff" : isToday ? "#EA925E" : "#C8836A", fontWeight: isSel||isToday ? 700 : 400, border: isToday&&!isSel ? "1px solid rgba(200,87,77,0.3)" : "1px solid transparent", position: "relative" }}>
               {day}
-              {hasEntry && !isSel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 3, height: 3, borderRadius: "50%", background: "#34d399" }} />}
+              {hasEntry && !isSel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 3, height: 3, borderRadius: "50%", background: "#F0C49A" }} />}
             </div>
           );
         })}
@@ -117,14 +117,14 @@ function MultiCalendarPicker({ selectedDates, onToggle, markedDates = [] }) {
   const prev = () => m === 0 ? (setM(11), setY(v => v-1)) : setM(v => v-1);
   const next = () => m === 11 ? (setM(0), setY(v => v+1)) : setM(v => v+1);
   return (
-    <div style={{ background: "#0f1724", padding: 20, userSelect: "none" }}>
+    <div style={{ background: "#180C0A", padding: 20, userSelect: "none" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <button onClick={prev} style={{ background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#64748b", cursor: "pointer", fontSize: 16 }}>&#8249;</button>
-        <span style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14 }}>{MONTHS[m]} {y}</span>
-        <button onClick={next} style={{ background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#64748b", cursor: "pointer", fontSize: 16 }}>&#8250;</button>
+        <button onClick={prev} style={{ background: "rgba(86,9,5,0.25)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#7A4035", cursor: "pointer", fontSize: 16 }}>&#8249;</button>
+        <span style={{ color: "#F5DDD5", fontWeight: 600, fontSize: 14 }}>{MONTHS[m]} {y}</span>
+        <button onClick={next} style={{ background: "rgba(86,9,5,0.25)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#7A4035", cursor: "pointer", fontSize: 16 }}>&#8250;</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 6 }}>
-        {DAYS.map((d, i) => <div key={i} style={{ textAlign: "center", color: "#334155", fontSize: 10, fontWeight: 800 }}>{d}</div>)}
+        {DAYS.map((d, i) => <div key={i} style={{ textAlign: "center", color: "#4A1E18", fontSize: 10, fontWeight: 800 }}>{d}</div>)}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
         {Array(first).fill(null).map((_, i) => <div key={"x"+i} />)}
@@ -133,9 +133,9 @@ function MultiCalendarPicker({ selectedDates, onToggle, markedDates = [] }) {
           const ds = y+"-"+String(m+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
           const isSel = selectedDates.includes(ds), isToday = ds === todayStr, hasEntry = markedDates.includes(ds);
           return (
-            <div key={day} onClick={() => onToggle(ds)} style={{ textAlign: "center", padding: "6px 2px", borderRadius: 8, cursor: "pointer", fontSize: 12, background: isSel ? "linear-gradient(135deg,#3b82f6,#06b6d4)" : isToday ? "rgba(59,130,246,0.12)" : "transparent", color: isSel ? "#fff" : isToday ? "#60a5fa" : "#94a3b8", fontWeight: isSel ? 700 : 400, border: isToday&&!isSel ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent", position: "relative" }}>
+            <div key={day} onClick={() => onToggle(ds)} style={{ textAlign: "center", padding: "6px 2px", borderRadius: 8, cursor: "pointer", fontSize: 12, background: isSel ? "linear-gradient(135deg,#C8574D,#84181C)" : isToday ? "rgba(176,48,38,0.12)" : "transparent", color: isSel ? "#fff" : isToday ? "#EA925E" : "#C8836A", fontWeight: isSel ? 700 : 400, border: isToday&&!isSel ? "1px solid rgba(200,87,77,0.3)" : "1px solid transparent", position: "relative" }}>
               {day}
-              {hasEntry && !isSel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 3, height: 3, borderRadius: "50%", background: "#34d399" }} />}
+              {hasEntry && !isSel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 3, height: 3, borderRadius: "50%", background: "#F0C49A" }} />}
             </div>
           );
         })}
@@ -154,22 +154,22 @@ function LoginScreen({ onLogin, users }) {
     if (u) onLogin(u); else setErr("Identifiants incorrects");
   };
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#080d14", fontFamily: "'Sora', sans-serif", position: "relative", overflow: "hidden", padding: "20px 16px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0D0806", fontFamily: "'Sora', sans-serif", position: "relative", overflow: "hidden", padding: "20px 16px" }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-      <div style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", top: "10%", left: "20%", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(176,48,38,0.08) 0%, transparent 70%)", top: "10%", left: "20%", pointerEvents: "none" }} />
       <div style={{ width: "100%", maxWidth: 400, position: "relative", zIndex: 1 }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg,#1e3a5f,#0f4c81)", border: "1px solid rgba(59,130,246,0.3)", marginBottom: 20, boxShadow: "0 0 40px rgba(59,130,246,0.15)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg,#2A1210,#560905)", border: "1px solid rgba(200,87,77,0.3)", marginBottom: 20, boxShadow: "0 0 40px rgba(200,87,77,0.15)" }}>
             <span style={{ fontSize: 32 }}>⛷️</span>
           </div>
-          <h1 style={{ color: "#f1f5f9", fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Club Manager</h1>
-          <p style={{ color: "#475569", fontSize: 13, margin: "6px 0 0" }}>Gestion des heures d'entraînement</p>
+          <h1 style={{ color: "#FBF0EC", fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Club Manager</h1>
+          <p style={{ color: "#6B3028", fontSize: 13, margin: "6px 0 0" }}>Gestion des heures d'entraînement</p>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 32 }}>
+        <div style={{ background: "rgba(86,9,5,0.15)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 32 }}>
           {err && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", color: "#f87171", fontSize: 13, marginBottom: 20 }}>⚠️ {err}</div>}
           <form action="#" onSubmit={e => { e.preventDefault(); handle(); }} style={{ display: "flex", flexDirection: "column", gap: 16 }} autoComplete="on">
             <div>
-              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Email</label>
+              <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Email</label>
               <input
                 type="email"
                 name="email"
@@ -177,11 +177,11 @@ function LoginScreen({ onLogin, users }) {
                 placeholder="votre@email.fr"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
+                style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
               />
             </div>
             <div>
-              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Mot de passe</label>
+              <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Mot de passe</label>
               <input
                 type="password"
                 name="password"
@@ -189,10 +189,10 @@ function LoginScreen({ onLogin, users }) {
                 placeholder="••••••••"
                 value={pwd}
                 onChange={e => setPwd(e.target.value)}
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
+                style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }}
               />
             </div>
-            <button type="submit" style={{ background: "linear-gradient(135deg,#3b82f6,#06b6d4)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 4, fontFamily: "inherit" }}>
+            <button type="submit" style={{ background: "linear-gradient(135deg,#C8574D,#B13026)", color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 4, fontFamily: "inherit" }}>
               Se connecter →
             </button>
           </form>
@@ -209,23 +209,23 @@ function Shell({ user, tab, setTab, onLogout, children }) {
   const adminTabs = [["dashboard","🏠","Dashboard"],["rapports","📈","Rapports"],["budget","💰","Budgets"],["parametres","⚙️","Params"]];
   const tabs = isAdmin ? adminTabs : coachTabs;
   return (
-    <div style={{ minHeight: "100vh", background: "#080d14", fontFamily: "'Sora', sans-serif", color: "#e2e8f0", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#0D0806", fontFamily: "'Sora', sans-serif", color: "#F5DDD5", display: "flex", flexDirection: "column" }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       {/* Ligne 1 — Club Manager */}
-      <div style={{ background: "#0a111d", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "9px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+      <div style={{ background: "#1F0E0B", borderBottom: "1px solid rgba(176,48,38,0.3)", padding: "9px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 20 }}>⛷️</span>
-          <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9", letterSpacing: -0.2 }}>Club Manager</span>
+          <span style={{ fontWeight: 800, fontSize: 15, color: "#FBF0EC", letterSpacing: -0.2 }}>Club Manager</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ color: "#64748b", fontSize: 11 }}>{isAdmin ? "👑" : "🎿"} {user.name}</span>
+          <span style={{ color: "#7A4035", fontSize: 11 }}>{isAdmin ? "👑" : "🎿"} {user.name}</span>
           <button onClick={onLogout} style={{ padding: "5px 10px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 6, color: "#f87171", fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 500 }}>Quitter</button>
         </div>
       </div>
       {/* Ligne 2 — Onglets (scrollable horizontal sur mobile) */}
-      <div style={{ background: "#0c1422", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", flexShrink: 0, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+      <div style={{ background: "#2A1210", borderBottom: "1px solid rgba(176,48,38,0.25)", display: "flex", flexShrink: 0, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
         {tabs.map(([k, icon, label]) => (
-          <button key={k} onClick={() => setTab(k)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "10px 16px", border: "none", background: tab === k ? "rgba(59,130,246,0.1)" : "transparent", color: tab === k ? "#60a5fa" : "#475569", fontWeight: tab === k ? 600 : 400, fontSize: 11, cursor: "pointer", fontFamily: "inherit", borderBottom: tab === k ? "2px solid #3b82f6" : "2px solid transparent", marginBottom: -1, transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}>
+          <button key={k} onClick={() => setTab(k)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "10px 16px", border: "none", background: tab === k ? "rgba(200,87,77,0.15)" : "transparent", color: tab === k ? "#EA925E" : "#7A4035", fontWeight: tab === k ? 600 : 400, fontSize: 11, cursor: "pointer", fontFamily: "inherit", borderBottom: tab === k ? "2px solid #C8574D" : "2px solid transparent", marginBottom: -1, transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}>
             <span style={{ fontSize: 16 }}>{icon}</span>
             <span>{label}</span>
           </button>
@@ -280,38 +280,38 @@ function CoachSaisie({ user, entries, dbOps }) {
   const handleEdit = (e) => { setEditId(e.id); setActivity(e.activity); setHours(String(e.hours)); setNote(e.note); setSelectedDates([e.date]); setCategories(e.categories || []); };
   const handleDelete = async (id) => { await dbOps.deleteEntry(id); setDeleteId(null); };
 
-  const fieldStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
+  const fieldStyle = { background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
 
   return (
     <div style={{ maxWidth: "100%" }}>
       <SectionTitle sub="Saisissez vos heures pour la ou les dates sélectionnées">Saisie des heures</SectionTitle>
       <Card>
-        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>{editId ? "✏️ Modifier la saisie" : "➕ Nouvelle saisie"}</h3>
-        {saved && <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, padding: "10px 14px", color: "#34d399", fontSize: 13, marginBottom: 16 }}>✅ {selectedDates.length > 1 ? `${selectedDates.length} saisies enregistrées !` : "Saisie enregistrée !"}</div>}
+        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#C8836A", fontWeight: 600 }}>{editId ? "✏️ Modifier la saisie" : "➕ Nouvelle saisie"}</h3>
+        {saved && <div style={{ background: "rgba(234,146,94,0.1)", border: "1px solid rgba(234,146,94,0.3)", borderRadius: 10, padding: "10px 14px", color: "#F0C49A", fontSize: 13, marginBottom: 16 }}>✅ {selectedDates.length > 1 ? `${selectedDates.length} saisies enregistrées !` : "Saisie enregistrée !"}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Dates */}
           <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>
+            <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>
               Date(s) <span style={{ color: "#ef4444" }}>*</span>
-              {selectedDates.length > 1 && <span style={{ color: "#34d399", fontWeight: 600, marginLeft: 8 }}>({selectedDates.length} jours)</span>}
+              {selectedDates.length > 1 && <span style={{ color: "#F0C49A", fontWeight: 600, marginLeft: 8 }}>({selectedDates.length} jours)</span>}
             </label>
             {selectedDates.length > 0 && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
                 {[...selectedDates].sort().map(d => (
-                  <div key={d} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: 99, padding: "4px 10px" }}>
-                    <span style={{ color: "#60a5fa", fontSize: 12, fontWeight: 600 }}>📅 {formatDate(d)}</span>
-                    {!editId && <span onClick={() => toggleDate(d)} style={{ color: "#334155", cursor: "pointer", fontSize: 14, fontWeight: 700 }}>×</span>}
+                  <div key={d} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(200,87,77,0.15)", border: "1px solid rgba(200,87,77,0.3)", borderRadius: 99, padding: "4px 10px" }}>
+                    <span style={{ color: "#EA925E", fontSize: 12, fontWeight: 600 }}>📅 {formatDate(d)}</span>
+                    {!editId && <span onClick={() => toggleDate(d)} style={{ color: "#4A1E18", cursor: "pointer", fontSize: 14, fontWeight: 700 }}>×</span>}
                   </div>
                 ))}
               </div>
             )}
-            <div onClick={() => setShowCal(!showCal)} style={{ background: "rgba(255,255,255,0.04)", border: showCal ? "1px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#64748b", fontSize: 13, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", userSelect: "none" }}>
+            <div onClick={() => setShowCal(!showCal)} style={{ background: "rgba(86,9,5,0.2)", border: showCal ? "1px solid rgba(200,87,77,0.5)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 14px", color: "#7A4035", fontSize: 13, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", userSelect: "none" }}>
               <span>{showCal ? "Fermer le calendrier" : "📅 Ajouter / modifier des dates"}</span>
               <span style={{ fontSize: 11 }}>{showCal ? "▲" : "▼"}</span>
             </div>
             {showCal && (
-              <div style={{ marginTop: 6, border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, overflow: "hidden" }}>
-                <div style={{ background: "rgba(59,130,246,0.06)", padding: "8px 14px", fontSize: 11, color: "#475569" }}>💡 Cliquez sur plusieurs jours pour les sélectionner. Recliquez pour désélectionner.</div>
+              <div style={{ marginTop: 6, border: "1px solid rgba(176,48,38,0.2)", borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ background: "rgba(176,48,38,0.06)", padding: "8px 14px", fontSize: 11, color: "#6B3028" }}>💡 Cliquez sur plusieurs jours pour les sélectionner. Recliquez pour désélectionner.</div>
                 <MultiCalendarPicker selectedDates={selectedDates} onToggle={toggleDate} markedDates={markedDates} />
               </div>
             )}
@@ -325,11 +325,11 @@ function CoachSaisie({ user, entries, dbOps }) {
           {/* Catégories */}
           {showCats && (
             <div>
-              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>Catégories <span style={{ color: "#ef4444" }}>*</span></label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))", gap: 8 }}>
+              <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>Catégories <span style={{ color: "#ef4444" }}>*</span></label>
+              <div style={{ display: "flex", gap: 10 }}>
                 {CATEGORIES.map(cat => {
                   const sel = categories.includes(cat);
-                  return <div key={cat} onClick={() => toggleCat(cat)} style={{ textAlign: "center", padding: "10px 6px", borderRadius: 10, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.03)", color: sel ? "#60a5fa" : "#475569", fontWeight: sel ? 700 : 400, fontSize: 13, userSelect: "none" }}>{cat}{sel && <div style={{ fontSize: 10, marginTop: 2, color: "#34d399" }}>✓</div>}</div>;
+                  return <div key={cat} onClick={() => toggleCat(cat)} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: 10, cursor: "pointer", border: `2px solid ${sel ? "#C8574D" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(200,87,77,0.15)" : "rgba(255,255,255,0.03)", color: sel ? "#EA925E" : "#6B3028", fontWeight: sel ? 700 : 400, fontSize: 14, userSelect: "none" }}>{cat}{sel && <div style={{ fontSize: 10, marginTop: 2, color: "#F0C49A" }}>✓</div>}</div>;
                 })}
               </div>
               {categories.length === 0 && <div style={{ color: "#f87171", fontSize: 11, marginTop: 6 }}>⚠️ Sélectionnez au moins une catégorie</div>}
@@ -338,8 +338,8 @@ function CoachSaisie({ user, entries, dbOps }) {
 
           {/* Heures */}
           <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Heures effectuées par journée<span style={{ color: "#ef4444" }}>*</span></label>
-            <select value={hours} onChange={e => setHours(e.target.value)} style={{ ...fieldStyle, background: !hours ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.04)", border: !hours ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(255,255,255,0.08)", color: hours ? "#000" : "#64748b" }}>
+            <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>Heures effectuées par journée<span style={{ color: "#ef4444" }}>*</span></label>
+            <select value={hours} onChange={e => setHours(e.target.value)} style={{ ...fieldStyle, background: !hours ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.04)", border: !hours ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(255,255,255,0.08)", color: hours ? "#000" : "#7A4035" }}>
               <option value="">— Sélectionner —</option>
               {[1,1.5,2,2.5,3,3.5,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
             </select>
@@ -359,29 +359,29 @@ function CoachSaisie({ user, entries, dbOps }) {
 
       {/* Stats */}
       <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 18px", textAlign: "center" }}>
-          <div style={{ color: "#60a5fa", fontWeight: 700, fontSize: 22 }}>{myEntries.reduce((s,e) => s+e.hours, 0)}h</div>
-          <div style={{ color: "#475569", fontSize: 11, marginTop: 2 }}>Total heures</div>
+        <div style={{ background: "#1C0D0B", border: "1px solid rgba(234,146,94,0.12)", borderRadius: 14, padding: "14px 18px", textAlign: "center" }}>
+          <div style={{ color: "#EA925E", fontWeight: 700, fontSize: 22 }}>{myEntries.reduce((s,e) => s+e.hours, 0)}h</div>
+          <div style={{ color: "#6B3028", fontSize: 11, marginTop: 2 }}>Total heures</div>
         </div>
-        <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: "14px 18px", textAlign: "center" }}>
-          <div style={{ color: "#34d399", fontWeight: 700, fontSize: 22 }}>{myEntries.length}</div>
-          <div style={{ color: "#475569", fontSize: 11, marginTop: 2 }}>Séances</div>
+        <div style={{ background: "#1C0D0B", border: "1px solid rgba(234,146,94,0.12)", borderRadius: 14, padding: "14px 18px", textAlign: "center" }}>
+          <div style={{ color: "#F0C49A", fontWeight: 700, fontSize: 22 }}>{myEntries.length}</div>
+          <div style={{ color: "#6B3028", fontSize: 11, marginTop: 2 }}>Séances</div>
         </div>
       </div>
 
       {/* Saisies du jour */}
       {todayEntries.length > 0 && (
         <Card style={{ marginTop: 16 }}>
-          <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#64748b", fontWeight: 600 }}>Saisies pour ce jour</h3>
+          <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#7A4035", fontWeight: 600 }}>Saisies pour ce jour</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {todayEntries.map(e => (
               <div key={e.id}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "rgba(86,9,5,0.15)", borderRadius: 10 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <Badge activity={e.activity} />
-                    {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
-                    <span style={{ color: "#e2e8f0", fontWeight: 600 }}>{e.hours}h</span>
-                    {e.note && <span style={{ color: "#475569", fontSize: 12 }}>— {e.note}</span>}
+                    {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#EA925E", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
+                    <span style={{ color: "#F5DDD5", fontWeight: 600 }}>{e.hours}h</span>
+                    {e.note && <span style={{ color: "#6B3028", fontSize: 12 }}>— {e.note}</span>}
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
                     <Btn small variant="ghost" onClick={() => handleEdit(e)}>✏️</Btn>
@@ -441,30 +441,30 @@ function CoachRapport({ user, entries, dbOps }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 20 }}>
-        {[{ label: "Total heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" }, { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" }].map(k => (
+        {[{ label: "Total heures", value: `${totalHours}h`, color: "#EA925E", icon: "⏱️" }, { label: "Séances", value: filtered.length, color: "#F0C49A", icon: "📋" }, { label: "Activités", value: byActivity.length, color: "#EA925E", icon: "🎿" }].map(k => (
           <Card key={k.label} style={{ padding: "20px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 8 }}>{k.icon}</div>
             <div style={{ color: k.color, fontWeight: 800, fontSize: 28 }}>{k.value}</div>
-            <div style={{ color: "#475569", fontSize: 12, marginTop: 4 }}>{k.label}</div>
+            <div style={{ color: "#6B3028", fontSize: 12, marginTop: 4 }}>{k.label}</div>
           </Card>
         ))}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par activité</h3>
-          {byActivity.length === 0 && <p style={{ color: "#334155", fontSize: 13 }}>Aucune donnée</p>}
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#C8836A" }}>Heures par activité</h3>
+          {byActivity.length === 0 && <p style={{ color: "#4A1E18", fontSize: 13 }}>Aucune donnée</p>}
           {byActivity.map(a => (
             <div key={a.activity} style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><Badge activity={a.activity} /><span style={{ color: "#e2e8f0", fontWeight: 700 }}>{a.hours}h</span></div>
-              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 6 }}><div style={{ background: ACT_COLORS[a.activity]?.bar || "#3b82f6", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} /></div>
-              <div style={{ color: "#334155", fontSize: 11, marginTop: 4 }}>{a.count} séance{a.count>1?"s":""} — {Math.round((a.hours/totalHours)*100)}%</div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><Badge activity={a.activity} /><span style={{ color: "#F5DDD5", fontWeight: 700 }}>{a.hours}h</span></div>
+              <div style={{ background: "rgba(86,9,5,0.25)", borderRadius: 99, height: 6 }}><div style={{ background: ACT_COLORS[a.activity]?.bar || "#C8574D", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} /></div>
+              <div style={{ color: "#4A1E18", fontSize: 11, marginTop: 4 }}>{a.count} séance{a.count>1?"s":""} — {Math.round((a.hours/totalHours)*100)}%</div>
               {a.hasCategories && a.byCategory.length > 0 && (
                 <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: "2px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 4 }}>
                   {a.byCategory.map(c => (
                     <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c.cat}</span>
-                      <span style={{ color: "#64748b", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
+                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#EA925E", padding: "2px 8px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c.cat}</span>
+                      <span style={{ color: "#7A4035", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
                     </div>
                   ))}
                 </div>
@@ -474,29 +474,29 @@ function CoachRapport({ user, entries, dbOps }) {
         </Card>
 
         <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Historique des saisies</h3>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#C8836A" }}>Historique des saisies</h3>
           <div style={{ maxHeight: 420, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
             {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
               <div key={e.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(86,9,5,0.1)", borderRadius: 10 }}>
                   <div>
-                    <div style={{ fontSize: 12, color: "#475569", marginBottom: 3 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
+                    <div style={{ fontSize: 12, color: "#6B3028", marginBottom: 3 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                       <Badge activity={e.activity} />
-                      {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
-                      {e.note && <span style={{ color: "#334155", fontSize: 11 }}>{e.note}</span>}
+                      {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#EA925E", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
+                      {e.note && <span style={{ color: "#4A1E18", fontSize: 11 }}>{e.note}</span>}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     {editHoursId === e.id ? (
                       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 6, padding: "3px 6px", color: "#e2e8f0", fontSize: 12, fontFamily: "inherit" }}>
+                        <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(86,9,5,0.35)", border: "1px solid rgba(200,87,77,0.4)", borderRadius: 6, padding: "3px 6px", color: "#F5DDD5", fontSize: 12, fontFamily: "inherit" }}>
                           {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
                         </select>
                         <Btn small variant="success" onClick={() => handleSaveHours(e.id)}>✓</Btn>
                         <Btn small variant="ghost" onClick={() => setEditHoursId(null)}>✕</Btn>
                       </div>
-                    ) : <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 16 }}>{e.hours}h</span>}
+                    ) : <span style={{ color: "#F5DDD5", fontWeight: 700, fontSize: 16 }}>{e.hours}h</span>}
                     <Btn small variant="ghost" onClick={() => handleEditHours(e.id)}>✏️</Btn>
                     <Btn small variant="danger" onClick={() => setDeleteId(e.id)}>🗑️</Btn>
                   </div>
@@ -521,14 +521,13 @@ function CoachRapport({ user, entries, dbOps }) {
 
 // ─── ADMIN : DASHBOARD ────────────────────────────────────────────────────────
 function AdminDashboard({ entries, rates, budgets }) {
-  const coaches = ["Jean Dupont","Marie Martin","Broisou"];
   const totalHours = entries.reduce((s,e) => s+e.hours, 0);
   const totalCost = entries.reduce((s,e) => s+e.hours*(rates[e.activity]||0), 0);
   const totalBudget = Object.values(budgets).reduce((s,v) => s+v, 0);
 
   const coachStats = [...new Set(entries.map(e => e.coachName))].map(name => {
     const ces = entries.filter(e => e.coachName === name);
-    return { name, hours: ces.reduce((s,e) => s+e.hours,0), cost: ces.reduce((s,e) => s+e.hours*(rates[e.activity]||0),0), sessions: ces.length };
+    return { name, hours: ces.reduce((s,e) => s+e.hours,0), cost: ces.reduce((s,e) => s+e.hours*(rates[e.activity]||0),0) };
   });
 
   const actStats = ACTIVITY_LIST.map(a => {
@@ -541,46 +540,74 @@ function AdminDashboard({ entries, rates, budgets }) {
 
   return (
     <div>
-      <SectionTitle sub="Vue d'ensemble du club">Dashboard</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
-        {[{ label: "Heures totales", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Coût total", value: fmt(totalCost), color: "#34d399", icon: "💶" }, { label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" }].map(k => (
-          <Card key={k.label} style={{ padding: "20px 22px" }}>
-            <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
-            <div style={{ color: k.color, fontWeight: 800, fontSize: 22 }}>{k.value}</div>
-            <div style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 600, marginTop: 4 }}>{k.label}</div>
+      <SectionTitle sub="Vue d ensemble du club">Dashboard</SectionTitle>
+
+      {/* KPIs 2 col mobile */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+        {[
+          { label: "Heures totales", value: totalHours+"h",             color: "#EA925E", icon: "⏱️" },
+          { label: "Cout total",     value: fmt(totalCost),             color: "#F0C49A", icon: "💶" },
+          { label: "Budget total",   value: fmt(totalBudget),           color: "#EA925E", icon: "🏦" },
+          { label: "Restant",        value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#C8574D":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" },
+        ].map(k => (
+          <Card key={k.label} style={{ padding: "12px 14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+              <span style={{ fontSize: 16 }}>{k.icon}</span>
+              <span style={{ color: "#7A4035", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{k.label}</span>
+            </div>
+            <div style={{ color: k.color, fontWeight: 800, fontSize: 18 }}>{k.value}</div>
           </Card>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par entraîneur</h3>
+
+      {/* Entraineurs - pleine largeur */}
+      <Card style={{ marginBottom: 12 }}>
+        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#C8836A", fontWeight: 700 }}>🎿 Heures par entraineur</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {coachStats.map(c => (
-            <div key={c.name} style={{ marginBottom: 18 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 14 }}>🎿 {c.name}</span>
-                <div style={{ display: "flex", gap: 16 }}><span style={{ color: "#60a5fa", fontWeight: 700 }}>{c.hours}h</span><span style={{ color: "#34d399", fontWeight: 700 }}>{fmt(c.cost)}</span></div>
+            <div key={c.name}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ fontSize: 14, color: "#F5DDD5", fontWeight: 500 }}>{c.name}</span>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <span style={{ color: "#EA925E", fontWeight: 700, fontSize: 14 }}>{c.hours}h</span>
+                  <span style={{ color: "#F0C49A", fontWeight: 600, fontSize: 13 }}>{fmt(c.cost)}</span>
+                </div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 6 }}><div style={{ background: "linear-gradient(90deg,#f59e0b,#ef4444)", height: "100%", borderRadius: 99, width: `${totalHours?(c.hours/Math.max(...coachStats.map(x=>x.hours)))*100:0}%` }} /></div>
+              <div style={{ background: "rgba(86,9,5,0.35)", borderRadius: 99, height: 7 }}>
+                <div style={{ background: "linear-gradient(90deg,#560905,#C8574D)", height: "100%", borderRadius: 99, width: coachStats.length && Math.max(...coachStats.map(x=>x.hours)) > 0 ? ((c.hours/Math.max(...coachStats.map(x=>x.hours)))*100)+"%": "0%", transition: "width .4s" }} />
+              </div>
             </div>
           ))}
-        </Card>
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Budget par activité</h3>
-          {actStats.map(a => (
-            <div key={a.activity} style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
-                <Badge activity={a.activity} />
-                <span style={{ color: a.remaining>=0?"#34d399":"#f87171", fontWeight: 700, fontSize: 13 }}>{fmt(a.remaining)}{a.remaining<0?" ⚠️":""}</span>
+        </div>
+      </Card>
+
+      {/* Budget activites - pleine largeur */}
+      <Card>
+        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#C8836A", fontWeight: 700 }}>💰 Budget par activite</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {actStats.map(a => {
+            const over = a.remaining < 0;
+            return (
+              <div key={a.activity}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <Badge activity={a.activity} />
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ color: over?"#f87171":"#F0C49A", fontWeight: 700, fontSize: 14 }}>{fmt(a.remaining)}{over?" ⚠️":""}</div>
+                    <div style={{ color: "#4A1E18", fontSize: 10, marginTop: 1 }}>{fmt(a.cost)} / {fmt(a.budget)}</div>
+                  </div>
+                </div>
+                <div style={{ background: "rgba(86,9,5,0.35)", borderRadius: 99, height: 8, overflow: "hidden" }}>
+                  <div style={{ background: over?"linear-gradient(90deg,#84181C,#560905)":ACT_COLORS[a.activity]?.bar||"#C8574D", height: "100%", borderRadius: 99, width: a.pct+"%", transition: "width .4s" }} />
+                </div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 8, overflow: "hidden" }}><div style={{ background: a.remaining<0?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.cost)} dépensé</span><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.budget)} budget</span></div>
-            </div>
-          ))}
-        </Card>
-      </div>
+            );
+          })}
+        </div>
+      </Card>
     </div>
   );
 }
+
 
 // ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
 function exportExcel(entries, rates) {
@@ -674,36 +701,36 @@ function AdminRapports({ entries, rates }) {
             {months.map(m => <option key={m} value={m}>{MONTHS[parseInt(m.split("-")[1])-1]} {m.split("-")[0]}</option>)}
           </Select>
           <div style={{ textAlign: "right" }}>
-            <div style={{ color: "#60a5fa", fontWeight: 800, fontSize: 20 }}>{totalHours}h</div>
-            <div style={{ color: "#34d399", fontWeight: 700, fontSize: 16 }}>{fmt(totalCost)}</div>
+            <div style={{ color: "#EA925E", fontWeight: 800, fontSize: 20 }}>{totalHours}h</div>
+            <div style={{ color: "#F0C49A", fontWeight: 700, fontSize: 16 }}>{fmt(totalCost)}</div>
           </div>
         </div>
       </Card>
 
       {/* Matrice heures */}
       <Card style={{ marginBottom: 16, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 14, color: "#94a3b8" }}>Matrice heures — Entraîneur × Activité</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 14, color: "#C8836A" }}>Matrice heures — Entraîneur × Activité</h3>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <th style={{ padding: "10px 16px", textAlign: "left", color: "#475569", fontWeight: 700 }}>Entraîneur</th>
-            {actStats.map(a => <th key={a.activity} style={{ padding: "10px 12px", textAlign: "center", color: ACT_COLORS[a.activity]?.text||"#e2e8f0", fontWeight: 600 }}>{a.activity}</th>)}
-            <th style={{ padding: "10px 12px", textAlign: "center", color: "#fbbf24", fontWeight: 700 }}>Total h</th>
-            <th style={{ padding: "10px 12px", textAlign: "center", color: "#34d399", fontWeight: 700 }}>Coût</th>
+            <th style={{ padding: "10px 16px", textAlign: "left", color: "#6B3028", fontWeight: 700 }}>Entraîneur</th>
+            {actStats.map(a => <th key={a.activity} style={{ padding: "10px 12px", textAlign: "center", color: ACT_COLORS[a.activity]?.text||"#F5DDD5", fontWeight: 600 }}>{a.activity}</th>)}
+            <th style={{ padding: "10px 12px", textAlign: "center", color: "#EA925E", fontWeight: 700 }}>Total h</th>
+            <th style={{ padding: "10px 12px", textAlign: "center", color: "#F0C49A", fontWeight: 700 }}>Coût</th>
           </tr></thead>
           <tbody>
             {coachStats.map(c => (
               <tr key={c.name} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <td style={{ padding: "12px 16px", color: "#e2e8f0", fontWeight: 500 }}>🎿 {c.name}</td>
-                {actStats.map(a => { const h = filtered.filter(e => e.coachName===c.name&&e.activity===a.activity).reduce((s,e) => s+e.hours,0); return <td key={a.activity} style={{ padding: "12px", textAlign: "center", color: h?"#e2e8f0":"#1e293b", fontWeight: h?600:400 }}>{h?`${h}h`:"—"}</td>; })}
-                <td style={{ padding: "12px", textAlign: "center", color: "#fbbf24", fontWeight: 700 }}>{c.hours}h</td>
-                <td style={{ padding: "12px", textAlign: "center", color: "#34d399", fontWeight: 700 }}>{fmt(c.cost)}</td>
+                <td style={{ padding: "12px 16px", color: "#F5DDD5", fontWeight: 500 }}>🎿 {c.name}</td>
+                {actStats.map(a => { const h = filtered.filter(e => e.coachName===c.name&&e.activity===a.activity).reduce((s,e) => s+e.hours,0); return <td key={a.activity} style={{ padding: "12px", textAlign: "center", color: h?"#F5DDD5":"#180A08", fontWeight: h?600:400 }}>{h?`${h}h`:"—"}</td>; })}
+                <td style={{ padding: "12px", textAlign: "center", color: "#EA925E", fontWeight: 700 }}>{c.hours}h</td>
+                <td style={{ padding: "12px", textAlign: "center", color: "#F0C49A", fontWeight: 700 }}>{fmt(c.cost)}</td>
               </tr>
             ))}
-            <tr style={{ borderTop: "2px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
-              <td style={{ padding: "12px 16px", color: "#64748b", fontWeight: 700, fontSize: 11, textTransform: "uppercase" }}>Total</td>
-              {actStats.map(a => <td key={a.activity} style={{ padding: "12px", textAlign: "center", color: ACT_COLORS[a.activity]?.text||"#e2e8f0", fontWeight: 700 }}>{a.hours}h</td>)}
-              <td style={{ padding: "12px", textAlign: "center", color: "#fbbf24", fontWeight: 800, fontSize: 15 }}>{totalHours}h</td>
-              <td style={{ padding: "12px", textAlign: "center", color: "#34d399", fontWeight: 800, fontSize: 15 }}>{fmt(totalCost)}</td>
+            <tr style={{ borderTop: "2px solid rgba(255,255,255,0.08)", background: "rgba(86,9,5,0.1)" }}>
+              <td style={{ padding: "12px 16px", color: "#7A4035", fontWeight: 700, fontSize: 11, textTransform: "uppercase" }}>Total</td>
+              {actStats.map(a => <td key={a.activity} style={{ padding: "12px", textAlign: "center", color: ACT_COLORS[a.activity]?.text||"#F5DDD5", fontWeight: 700 }}>{a.hours}h</td>)}
+              <td style={{ padding: "12px", textAlign: "center", color: "#EA925E", fontWeight: 800, fontSize: 15 }}>{totalHours}h</td>
+              <td style={{ padding: "12px", textAlign: "center", color: "#F0C49A", fontWeight: 800, fontSize: 15 }}>{fmt(totalCost)}</td>
             </tr>
           </tbody>
         </table>
@@ -712,13 +739,13 @@ function AdminRapports({ entries, rates }) {
       {/* Rapport catégories */}
       {filtered.some(e => e.categories&&e.categories.length>0) && (
         <Card style={{ marginBottom: 20, overflowX: "auto" }}>
-          <h3 style={{ margin: "0 0 6px", fontSize: 15, color: "#94a3b8" }}>Heures par entraîneur × catégorie</h3>
-          <p style={{ color: "#334155", fontSize: 12, margin: "0 0 20px" }}>Cumul pour Entraînement et Course</p>
+          <h3 style={{ margin: "0 0 6px", fontSize: 15, color: "#C8836A" }}>Heures par entraîneur × catégorie</h3>
+          <p style={{ color: "#4A1E18", fontSize: 12, margin: "0 0 20px" }}>Cumul pour Entraînement et Course</p>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, marginBottom: 20 }}>
             <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              <th style={{ padding: "10px 16px", textAlign: "left", color: "#475569", fontWeight: 700 }}>Entraîneur</th>
-              {CATEGORIES.map(cat => <th key={cat} style={{ padding: "10px 16px", textAlign: "center", color: "#fbbf24", fontWeight: 700 }}>{cat}</th>)}
-              <th style={{ padding: "10px 16px", textAlign: "center", color: "#60a5fa", fontWeight: 700 }}>Total</th>
+              <th style={{ padding: "10px 16px", textAlign: "left", color: "#6B3028", fontWeight: 700 }}>Entraîneur</th>
+              {CATEGORIES.map(cat => <th key={cat} style={{ padding: "10px 16px", textAlign: "center", color: "#EA925E", fontWeight: 700 }}>{cat}</th>)}
+              <th style={{ padding: "10px 16px", textAlign: "center", color: "#EA925E", fontWeight: 700 }}>Total</th>
             </tr></thead>
             <tbody>
               {coachStats.map(c => {
@@ -728,16 +755,16 @@ function AdminRapports({ entries, rates }) {
                 if (total===0) return null;
                 return (
                   <tr key={c.name} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    <td style={{ padding: "12px 16px", color: "#e2e8f0", fontWeight: 500 }}>🎿 {c.name}</td>
-                    {catH.map(c => <td key={c.cat} style={{ padding: "12px 16px", textAlign: "center" }}>{c.hours>0?(<div><div style={{ color: "#e2e8f0", fontWeight: 700 }}>{c.hours}h</div><div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 4, marginTop: 4 }}><div style={{ background: "linear-gradient(90deg,#f59e0b,#fbbf24)", height: "100%", borderRadius: 99, width: `${total?(c.hours/total)*100:0}%` }} /></div></div>):<span style={{ color: "#1e293b" }}>—</span>}</td>)}
-                    <td style={{ padding: "12px 16px", textAlign: "center", color: "#60a5fa", fontWeight: 800 }}>{total}h</td>
+                    <td style={{ padding: "12px 16px", color: "#F5DDD5", fontWeight: 500 }}>🎿 {c.name}</td>
+                    {catH.map(c => <td key={c.cat} style={{ padding: "12px 16px", textAlign: "center" }}>{c.hours>0?(<div><div style={{ color: "#F5DDD5", fontWeight: 700 }}>{c.hours}h</div><div style={{ background: "rgba(86,9,5,0.25)", borderRadius: 99, height: 4, marginTop: 4 }}><div style={{ background: "linear-gradient(90deg,#C8574D,#EA925E)", height: "100%", borderRadius: 99, width: `${total?(c.hours/total)*100:0}%` }} /></div></div>):<span style={{ color: "#180A08" }}>—</span>}</td>)}
+                    <td style={{ padding: "12px 16px", textAlign: "center", color: "#EA925E", fontWeight: 800 }}>{total}h</td>
                   </tr>
                 );
               })}
-              <tr style={{ borderTop: "2px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
-                <td style={{ padding: "12px 16px", color: "#64748b", fontWeight: 700, fontSize: 11, textTransform: "uppercase" }}>Total</td>
-                {CATEGORIES.map(cat => { const h = filtered.filter(e => e.categories&&e.categories.includes(cat)).reduce((s,e) => s+e.hours,0); return <td key={cat} style={{ padding: "12px 16px", textAlign: "center", color: "#fbbf24", fontWeight: 800 }}>{h>0?`${h}h`:"—"}</td>; })}
-                <td style={{ padding: "12px 16px", textAlign: "center", color: "#60a5fa", fontWeight: 800 }}>{filtered.filter(e => e.categories&&e.categories.length>0).reduce((s,e) => s+e.hours,0)}h</td>
+              <tr style={{ borderTop: "2px solid rgba(255,255,255,0.08)", background: "rgba(86,9,5,0.1)" }}>
+                <td style={{ padding: "12px 16px", color: "#7A4035", fontWeight: 700, fontSize: 11, textTransform: "uppercase" }}>Total</td>
+                {CATEGORIES.map(cat => { const h = filtered.filter(e => e.categories&&e.categories.includes(cat)).reduce((s,e) => s+e.hours,0); return <td key={cat} style={{ padding: "12px 16px", textAlign: "center", color: "#EA925E", fontWeight: 800 }}>{h>0?`${h}h`:"—"}</td>; })}
+                <td style={{ padding: "12px 16px", textAlign: "center", color: "#EA925E", fontWeight: 800 }}>{filtered.filter(e => e.categories&&e.categories.length>0).reduce((s,e) => s+e.hours,0)}h</td>
               </tr>
             </tbody>
           </table>
@@ -747,19 +774,19 @@ function AdminRapports({ entries, rates }) {
       {/* Catégories par activité */}
       {actStats.some(a => a.hasCategories&&a.byCategory.length>0) && (
         <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par catégorie (U8 / U10 / U12 / U14 / U16 / U18 / Master)</h3>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#C8836A" }}>Heures par catégorie (U8 / U10 / U12 / U14 / U16 / U18 / Master)</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
             {actStats.filter(a => a.hasCategories&&a.byCategory.length>0).map(a => (
               <div key={a.activity}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}><Badge activity={a.activity} /><span style={{ color: "#64748b", fontSize: 12 }}>Total : <strong style={{ color: "#e2e8f0" }}>{a.hours}h</strong></span></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}><Badge activity={a.activity} /><span style={{ color: "#7A4035", fontSize: 12 }}>Total : <strong style={{ color: "#F5DDD5" }}>{a.hours}h</strong></span></div>
                 {a.byCategory.map(c => (
                   <div key={c.cat} style={{ marginBottom: 10 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600 }}>{c.cat}</span>
-                      <div style={{ display: "flex", gap: 12 }}><span style={{ color: "#e2e8f0", fontWeight: 700 }}>{c.hours}h</span><span style={{ color: "#34d399", fontWeight: 600 }}>{fmt(c.hours*(rates[a.activity]||0))}</span></div>
+                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#EA925E", padding: "2px 10px", borderRadius: 99, fontSize: 12, fontWeight: 600 }}>{c.cat}</span>
+                      <div style={{ display: "flex", gap: 12 }}><span style={{ color: "#F5DDD5", fontWeight: 700 }}>{c.hours}h</span><span style={{ color: "#F0C49A", fontWeight: 600 }}>{fmt(c.hours*(rates[a.activity]||0))}</span></div>
                     </div>
-                    <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 6 }}><div style={{ background: "linear-gradient(90deg,#f59e0b,#fbbf24)", height: "100%", borderRadius: 99, width: `${a.hours?(c.hours/a.hours)*100:0}%` }} /></div>
-                    <div style={{ color: "#334155", fontSize: 10, marginTop: 3 }}>{a.hours?Math.round((c.hours/a.hours)*100):0}% du total</div>
+                    <div style={{ background: "rgba(86,9,5,0.25)", borderRadius: 99, height: 6 }}><div style={{ background: "linear-gradient(90deg,#C8574D,#EA925E)", height: "100%", borderRadius: 99, width: `${a.hours?(c.hours/a.hours)*100:0}%` }} /></div>
+                    <div style={{ color: "#4A1E18", fontSize: 10, marginTop: 3 }}>{a.hours?Math.round((c.hours/a.hours)*100):0}% du total</div>
                   </div>
                 ))}
               </div>
@@ -771,26 +798,26 @@ function AdminRapports({ entries, rates }) {
       {/* Détail saisies */}
       <Card style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <h3 style={{ margin: 0, fontSize: 14, color: "#94a3b8" }}>Détail des saisies ({filtered.length})</h3>
-          <button onClick={() => exportExcel(filtered, rates)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "linear-gradient(135deg,#10b981,#06b6d4)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+          <h3 style={{ margin: 0, fontSize: 14, color: "#C8836A" }}>Détail des saisies ({filtered.length})</h3>
+          <button onClick={() => exportExcel(filtered, rates)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "linear-gradient(135deg,#EA925E,#C8574D)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
             📥 Exporter Excel
           </button>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead><tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            {["Date","Entraîneur","Activité","Catégories","Heures","Taux","Coût","Note"].map(h => <th key={h} style={{ padding: "8px 14px", textAlign: "left", color: "#334155", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>{h}</th>)}
+            {["Date","Entraîneur","Activité","Catégories","Heures","Taux","Coût","Note"].map(h => <th key={h} style={{ padding: "8px 14px", textAlign: "left", color: "#4A1E18", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8 }}>{h}</th>)}
           </tr></thead>
           <tbody>
             {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
               <tr key={e.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                <td style={{ padding: "10px 14px", color: "#64748b" }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</td>
-                <td style={{ padding: "10px 14px", color: "#e2e8f0", fontWeight: 500 }}>{e.coachName}</td>
+                <td style={{ padding: "10px 14px", color: "#7A4035" }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</td>
+                <td style={{ padding: "10px 14px", color: "#F5DDD5", fontWeight: 500 }}>{e.coachName}</td>
                 <td style={{ padding: "10px 14px" }}><Badge activity={e.activity} /></td>
-                <td style={{ padding: "10px 14px" }}>{e.categories&&e.categories.length>0?<div style={{ display: "flex", gap: 4 }}>{e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 7px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}</div>:<span style={{ color: "#334155", fontSize: 12 }}>—</span>}</td>
-                <td style={{ padding: "10px 14px", color: "#e2e8f0", fontWeight: 600 }}>{e.hours}h</td>
-                <td style={{ padding: "10px 14px", color: "#94a3b8" }}>{fmt(rates[e.activity]||0)}/h</td>
-                <td style={{ padding: "10px 14px", color: "#34d399", fontWeight: 700 }}>{fmt(e.hours*(rates[e.activity]||0))}</td>
-                <td style={{ padding: "10px 14px", color: "#475569", fontSize: 12 }}>{e.note||"—"}</td>
+                <td style={{ padding: "10px 14px" }}>{e.categories&&e.categories.length>0?<div style={{ display: "flex", gap: 4 }}>{e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.12)", color: "#EA925E", padding: "2px 7px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}</div>:<span style={{ color: "#4A1E18", fontSize: 12 }}>—</span>}</td>
+                <td style={{ padding: "10px 14px", color: "#F5DDD5", fontWeight: 600 }}>{e.hours}h</td>
+                <td style={{ padding: "10px 14px", color: "#C8836A" }}>{fmt(rates[e.activity]||0)}/h</td>
+                <td style={{ padding: "10px 14px", color: "#F0C49A", fontWeight: 700 }}>{fmt(e.hours*(rates[e.activity]||0))}</td>
+                <td style={{ padding: "10px 14px", color: "#6B3028", fontSize: 12 }}>{e.note||"—"}</td>
               </tr>
             ))}
           </tbody>
@@ -822,11 +849,11 @@ function AdminBudget({ entries, rates, budgets, dbOps }) {
     <div>
       <SectionTitle sub="Définissez et suivez les budgets par activité">Gestion des budgets</SectionTitle>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
-        {[{ label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Coût engagé", value: fmt(totalCost), color: "#f87171", icon: "💶" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#34d399":"#f87171", icon: totalBudget-totalCost>=0?"✅":"⚠️" }].map(k => (
+        {[{ label: "Budget total", value: fmt(totalBudget), color: "#EA925E", icon: "🏦" }, { label: "Coût engagé", value: fmt(totalCost), color: "#f87171", icon: "💶" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#F0C49A":"#f87171", icon: totalBudget-totalCost>=0?"✅":"⚠️" }].map(k => (
           <Card key={k.label} style={{ padding: "22px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 28, marginBottom: 10 }}>{k.icon}</div>
             <div style={{ color: k.color, fontWeight: 800, fontSize: 24 }}>{k.value}</div>
-            <div style={{ color: "#475569", fontSize: 13, marginTop: 4 }}>{k.label}</div>
+            <div style={{ color: "#6B3028", fontSize: 13, marginTop: 4 }}>{k.label}</div>
           </Card>
         ))}
       </div>
@@ -837,17 +864,17 @@ function AdminBudget({ entries, rates, budgets, dbOps }) {
             <Card key={a.activity}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
                 <Badge activity={a.activity} />
-                <div style={{ textAlign: "right" }}><div style={{ color: over?"#f87171":"#34d399", fontWeight: 800, fontSize: 20 }}>{fmt(a.remaining)}</div><div style={{ color: "#334155", fontSize: 11 }}>{over?"⚠️ Dépassement":"Restant"}</div></div>
+                <div style={{ textAlign: "right" }}><div style={{ color: over?"#f87171":"#F0C49A", fontWeight: 800, fontSize: 20 }}>{fmt(a.remaining)}</div><div style={{ color: "#4A1E18", fontSize: 11 }}>{over?"⚠️ Dépassement":"Restant"}</div></div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 10, marginBottom: 12, overflow: "hidden" }}><div style={{ background: over?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
+              <div style={{ background: "rgba(86,9,5,0.25)", borderRadius: 99, height: 10, marginBottom: 12, overflow: "hidden" }}><div style={{ background: over?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#C8574D", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 14 }}>
-                {[{ label: "Heures", value: `${a.hours}h`, color: "#60a5fa" }, { label: "Coût", value: fmt(a.cost), color: "#f87171" }, { label: "Budget", value: fmt(a.budget), color: "#fbbf24" }].map(s => (
-                  <div key={s.label} style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: "10px 8px", textAlign: "center" }}><div style={{ color: s.color, fontWeight: 700, fontSize: 14 }}>{s.value}</div><div style={{ color: "#334155", fontSize: 10, marginTop: 2 }}>{s.label}</div></div>
+                {[{ label: "Heures", value: `${a.hours}h`, color: "#EA925E" }, { label: "Coût", value: fmt(a.cost), color: "#f87171" }, { label: "Budget", value: fmt(a.budget), color: "#EA925E" }].map(s => (
+                  <div key={s.label} style={{ background: "rgba(86,9,5,0.15)", borderRadius: 8, padding: "10px 8px", textAlign: "center" }}><div style={{ color: s.color, fontWeight: 700, fontSize: 14 }}>{s.value}</div><div style={{ color: "#4A1E18", fontSize: 10, marginTop: 2 }}>{s.label}</div></div>
                 ))}
               </div>
               {editing === a.activity ? (
                 <div style={{ display: "flex", gap: 8 }}>
-                  <input value={val} onChange={e => setVal(e.target.value)} placeholder="Nouveau budget (€)" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, outline: "none", flex: 1, fontFamily: "inherit" }} onKeyDown={e => e.key==="Enter"&&saveBudget(a.activity)} />
+                  <input value={val} onChange={e => setVal(e.target.value)} placeholder="Nouveau budget (€)" style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 8, padding: "9px 12px", color: "#F5DDD5", fontSize: 13, outline: "none", flex: 1, fontFamily: "inherit" }} onKeyDown={e => e.key==="Enter"&&saveBudget(a.activity)} />
                   <Btn small onClick={() => saveBudget(a.activity)} variant="success">✓</Btn>
                   <Btn small onClick={() => setEditing(null)} variant="ghost">✕</Btn>
                 </div>
@@ -873,7 +900,7 @@ function AdminParametres({ rates, users, dbOps }) {
   const [oldPwd, setOldPwd] = useState(""); const [newPwd, setNewPwd] = useState(""); const [confirmPwd, setConfirmPwd] = useState(""); const [pwdMsg, setPwdMsg] = useState(null);
   const adminUser = users.find(u => u.role === "admin");
   const coaches = users.filter(u => u.role === "coach");
-  const fieldStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
+  const fieldStyle = { background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 8, padding: "9px 12px", color: "#F5DDD5", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
   const showCoachMsg = (type, text) => { setCoachMsg({ type, text }); setTimeout(() => setCoachMsg(null), 3000); };
   const saveRate = async (activity) => { const v = parseFloat(rateVal); if (!isNaN(v)&&v>=0) { await dbOps.updateRate(activity, v); } setEditingRate(null); setRateVal(""); };
   const handleAddCoach = async () => {
@@ -906,11 +933,11 @@ function AdminParametres({ rates, users, dbOps }) {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>
         {/* Taux horaires */}
         <div style={{ flex: "1 1 300px", minWidth: 0 }}>
-          <h3 style={{ margin: "0 0 16px", color: "#94a3b8", fontSize: 15 }}>⚙️ Taux horaires</h3>
+          <h3 style={{ margin: "0 0 16px", color: "#C8836A", fontSize: 15 }}>⚙️ Taux horaires</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {ACTIVITY_LIST.map(a => (
               <Card key={a} style={{ padding: "16px 20px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><Badge activity={a} /><span style={{ color: "#34d399", fontWeight: 800, fontSize: 18 }}>{fmt(rates[a]||0)}<span style={{ fontSize: 11, color: "#475569", fontWeight: 400 }}>/h</span></span></div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><Badge activity={a} /><span style={{ color: "#F0C49A", fontWeight: 800, fontSize: 18 }}>{fmt(rates[a]||0)}<span style={{ fontSize: 11, color: "#6B3028", fontWeight: 400 }}>/h</span></span></div>
                 {editingRate === a ? (
                   <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                     <input value={rateVal} onChange={e => setRateVal(e.target.value)} placeholder="€/h" style={fieldStyle} onKeyDown={e => e.key==="Enter"&&saveRate(a)} />
@@ -928,13 +955,13 @@ function AdminParametres({ rates, users, dbOps }) {
           {/* Gestion entraîneurs */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ margin: 0, color: "#94a3b8", fontSize: 15 }}>👥 Entraîneurs</h3>
+              <h3 style={{ margin: 0, color: "#C8836A", fontSize: 15 }}>👥 Entraîneurs</h3>
               <Btn small onClick={() => setShowAddForm(!showAddForm)} variant={showAddForm?"ghost":"primary"}>{showAddForm?"✕ Annuler":"➕ Ajouter"}</Btn>
             </div>
-            {coachMsg && <div style={{ background: coachMsg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${coachMsg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: coachMsg.type==="success"?"#34d399":"#f87171", fontSize: 13, marginBottom: 14 }}>{coachMsg.type==="success"?"✅":"⚠️"} {coachMsg.text}</div>}
+            {coachMsg && <div style={{ background: coachMsg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${coachMsg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: coachMsg.type==="success"?"#F0C49A":"#f87171", fontSize: 13, marginBottom: 14 }}>{coachMsg.type==="success"?"✅":"⚠️"} {coachMsg.text}</div>}
             {showAddForm && (
               <Card style={{ marginBottom: 14, padding: 18 }}>
-                <h4 style={{ margin: "0 0 14px", color: "#94a3b8", fontSize: 13 }}>Nouvel entraîneur</h4>
+                <h4 style={{ margin: "0 0 14px", color: "#C8836A", fontSize: 13 }}>Nouvel entraîneur</h4>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <input value={newCoach.name} onChange={e => setNewCoach(p => ({...p,name:e.target.value}))} placeholder="Nom complet" style={fieldStyle} />
                   <input value={newCoach.email} onChange={e => setNewCoach(p => ({...p,email:e.target.value}))} placeholder="Email" type="email" style={fieldStyle} />
@@ -956,7 +983,7 @@ function AdminParametres({ rates, users, dbOps }) {
                       </div>
                     ) : (
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div><div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13 }}>🎿 {c.name}</div><div style={{ color: "#334155", fontSize: 11, marginTop: 2 }}>{c.email}</div></div>
+                        <div><div style={{ color: "#F5DDD5", fontWeight: 600, fontSize: 13 }}>🎿 {c.name}</div><div style={{ color: "#4A1E18", fontSize: 11, marginTop: 2 }}>{c.email}</div></div>
                         <div style={{ display: "flex", gap: 6 }}><Btn small variant="ghost" onClick={() => { setEditCoachId(c.id); setEditCoachData({ name:c.name, email:c.email, password:"" }); }}>✏️</Btn><Btn small variant="danger" onClick={() => setDeleteCoachId(c.id)}>🗑️</Btn></div>
                       </div>
                     )}
@@ -974,8 +1001,8 @@ function AdminParametres({ rates, users, dbOps }) {
 
           {/* Mot de passe admin */}
           <Card>
-            <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>🔒 Mon mot de passe</h3>
-            {pwdMsg && <div style={{ background: pwdMsg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${pwdMsg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: pwdMsg.type==="success"?"#34d399":"#f87171", fontSize: 13, marginBottom: 14 }}>{pwdMsg.type==="success"?"✅":"⚠️"} {pwdMsg.text}</div>}
+            <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#C8836A", fontWeight: 600 }}>🔒 Mon mot de passe</h3>
+            {pwdMsg && <div style={{ background: pwdMsg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${pwdMsg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: pwdMsg.type==="success"?"#F0C49A":"#f87171", fontSize: 13, marginBottom: 14 }}>{pwdMsg.type==="success"?"✅":"⚠️"} {pwdMsg.text}</div>}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <input type="password" value={oldPwd} onChange={e => setOldPwd(e.target.value)} placeholder="Ancien mot de passe" style={fieldStyle} />
               <input type="password" value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="Nouveau mot de passe" style={fieldStyle} />
@@ -1006,23 +1033,23 @@ function MonCompte({ user, users, dbOps }) {
     <div style={{ maxWidth: "100%" }}>
       <SectionTitle sub="Gérez vos informations personnelles">Mon compte</SectionTitle>
       <Card style={{ marginBottom: 20 }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>👤 Informations</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, color: "#C8836A", fontWeight: 600 }}>👤 Informations</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {[{ label: "Nom", value: user.name }, { label: "Email", value: user.email }, { label: "Rôle", value: "🎿 Entraîneur" }].map(f => (
-            <div key={f.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: 10 }}>
-              <span style={{ color: "#64748b", fontSize: 13 }}>{f.label}</span><span style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 500 }}>{f.value}</span>
+            <div key={f.label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", background: "rgba(86,9,5,0.15)", borderRadius: 10 }}>
+              <span style={{ color: "#7A4035", fontSize: 13 }}>{f.label}</span><span style={{ color: "#F5DDD5", fontSize: 13, fontWeight: 500 }}>{f.value}</span>
             </div>
           ))}
         </div>
       </Card>
       <Card>
-        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8", fontWeight: 600 }}>🔒 Modifier le mot de passe</h3>
-        {msg && <div style={{ background: msg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${msg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: msg.type==="success"?"#34d399":"#f87171", fontSize: 13, marginBottom: 16 }}>{msg.type==="success"?"✅":"⚠️"} {msg.text}</div>}
+        <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#C8836A", fontWeight: 600 }}>🔒 Modifier le mot de passe</h3>
+        {msg && <div style={{ background: msg.type==="success"?"rgba(16,185,129,0.1)":"rgba(239,68,68,0.1)", border: `1px solid ${msg.type==="success"?"rgba(16,185,129,0.3)":"rgba(239,68,68,0.3)"}`, borderRadius: 10, padding: "10px 14px", color: msg.type==="success"?"#F0C49A":"#f87171", fontSize: 13, marginBottom: 16 }}>{msg.type==="success"?"✅":"⚠️"} {msg.text}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[["Ancien mot de passe", oldPwd, setOldPwd], ["Nouveau mot de passe", newPwd, setNewPwd], ["Confirmer le mot de passe", confirmPwd, setConfirmPwd]].map(([label, val, setter]) => (
             <div key={label}>
-              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>
-              <input type="password" value={val} onChange={e => setter(e.target.value)} placeholder="••••••••" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }} onKeyDown={e => e.key==="Enter"&&handleChange()} />
+              <label style={{ display: "block", color: "#7A4035", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>{label}</label>
+              <input type="password" value={val} onChange={e => setter(e.target.value)} placeholder="••••••••" style={{ background: "rgba(86,9,5,0.2)", border: "1px solid rgba(176,48,38,0.2)", borderRadius: 10, padding: "11px 14px", color: "#F5DDD5", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" }} onKeyDown={e => e.key==="Enter"&&handleChange()} />
             </div>
           ))}
           <Btn onClick={handleChange} variant="primary">Modifier le mot de passe</Btn>
@@ -1154,24 +1181,24 @@ export default function App() {
 
   // ── Écrans chargement/erreur ──
   if (loading) return (
-    <div style={{ minHeight: "100vh", background: "#080d14", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#0D0806", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet" />
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 20 }}>⛷️</div>
-        <div style={{ color: "#60a5fa", fontSize: 16, fontWeight: 600 }}>Chargement en cours...</div>
-        <div style={{ color: "#334155", fontSize: 13, marginTop: 8 }}>Connexion à Supabase</div>
+        <div style={{ color: "#EA925E", fontSize: 16, fontWeight: 600 }}>Chargement en cours...</div>
+        <div style={{ color: "#4A1E18", fontSize: 13, marginTop: 8 }}>Connexion à Supabase</div>
       </div>
     </div>
   );
 
   if (dbError) return (
-    <div style={{ minHeight: "100vh", background: "#080d14", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#0D0806", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet" />
       <div style={{ textAlign: "center", maxWidth: 440, padding: 24 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
         <div style={{ color: "#f87171", fontSize: 18, fontWeight: 700, marginBottom: 12 }}>Erreur de connexion Supabase</div>
         <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "14px 18px", color: "#fca5a5", fontSize: 13, marginBottom: 16 }}>{dbError}</div>
-        <div style={{ color: "#475569", fontSize: 12 }}>Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans le fichier .env</div>
+        <div style={{ color: "#6B3028", fontSize: 12 }}>Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans le fichier .env</div>
       </div>
     </div>
   );
