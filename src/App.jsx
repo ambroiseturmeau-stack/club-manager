@@ -433,88 +433,103 @@ function CoachRapport({ user, entries, dbOps }) {
   return (
     <div>
       <SectionTitle sub="Visualisez vos heures par activité">Mon rapport d'activité</SectionTitle>
-      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} style={{ minWidth: 150, flex: "1 1 140px" }}>
+
+      {/* Filtre mois */}
+      <div style={{ marginBottom: 16 }}>
+        <Select label="Filtrer par mois" value={filterMonth} onChange={e => setFilterMonth(e.target.value)}>
           <option value="all">Tous les mois</option>
           {months.map(m => <option key={m} value={m}>{MONTHS[parseInt(m.split("-")[1])-1]} {m.split("-")[0]}</option>)}
         </Select>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 20 }}>
-        {[{ label: "Total heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" }, { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" }].map(k => (
-          <Card key={k.label} style={{ padding: "20px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 28, marginBottom: 8 }}>{k.icon}</div>
-            <div style={{ color: k.color, fontWeight: 800, fontSize: 28 }}>{k.value}</div>
-            <div style={{ color: "#475569", fontSize: 12, marginTop: 4 }}>{k.label}</div>
+      {/* KPIs 3 col compactes */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 14 }}>
+        {[
+          { label: "Heures", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" },
+          { label: "Séances", value: filtered.length, color: "#34d399", icon: "📋" },
+          { label: "Activités", value: byActivity.length, color: "#fbbf24", icon: "🎿" },
+        ].map(k => (
+          <Card key={k.label} style={{ padding: "12px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 20, marginBottom: 4 }}>{k.icon}</div>
+            <div style={{ color: k.color, fontWeight: 800, fontSize: 22 }}>{k.value}</div>
+            <div style={{ color: "#475569", fontSize: 10, marginTop: 3 }}>{k.label}</div>
           </Card>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par activité</h3>
-          {byActivity.length === 0 && <p style={{ color: "#334155", fontSize: 13 }}>Aucune donnée</p>}
-          {byActivity.map(a => (
-            <div key={a.activity} style={{ marginBottom: 20 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><Badge activity={a.activity} /><span style={{ color: "#e2e8f0", fontWeight: 700 }}>{a.hours}h</span></div>
-              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 6 }}><div style={{ background: ACT_COLORS[a.activity]?.bar || "#3b82f6", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} /></div>
-              <div style={{ color: "#334155", fontSize: 11, marginTop: 4 }}>{a.count} séance{a.count>1?"s":""} — {Math.round((a.hours/totalHours)*100)}%</div>
-              {a.hasCategories && a.byCategory.length > 0 && (
-                <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: "2px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 4 }}>
-                  {a.byCategory.map(c => (
-                    <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c.cat}</span>
-                      <span style={{ color: "#64748b", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
+      {/* Heures par activité — pleine largeur */}
+      <Card style={{ marginBottom: 12 }}>
+        <h3 style={{ margin: "0 0 16px", fontSize: 14, color: "#94a3b8" }}>Heures par activité</h3>
+        {byActivity.length === 0 && <p style={{ color: "#334155", fontSize: 13 }}>Aucune donnée</p>}
+        {byActivity.map(a => (
+          <div key={a.activity} style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <Badge activity={a.activity} />
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <span style={{ color: "#94a3b8", fontSize: 11 }}>{a.count} séance{a.count>1?"s":""}</span>
+                <span style={{ color: "#e2e8f0", fontWeight: 700 }}>{a.hours}h</span>
+                <span style={{ color: "#64748b", fontSize: 11 }}>{Math.round((a.hours/totalHours)*100)}%</span>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 99, height: 7 }}>
+              <div style={{ background: ACT_COLORS[a.activity]?.bar || "#3b82f6", height: "100%", borderRadius: 99, width: `${(a.hours/totalHours)*100}%` }} />
+            </div>
+            {a.hasCategories && a.byCategory.length > 0 && (
+              <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: "2px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", gap: 5 }}>
+                {a.byCategory.map(c => (
+                  <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c.cat}</span>
+                    <span style={{ color: "#64748b", fontSize: 12, fontWeight: 600 }}>{c.hours}h</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </Card>
+
+      {/* Historique — pleine largeur */}
+      <Card>
+        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>Historique des saisies</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
+            <div key={e.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 11, color: "#475569", marginBottom: 4 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+                    <Badge activity={e.activity} />
+                    {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 7px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c}</span>)}
+                    {e.note && <span style={{ color: "#334155", fontSize: 11 }}>{e.note}</span>}
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0, marginLeft: 8 }}>
+                  {editHoursId === e.id ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 6, padding: "3px 6px", color: "#e2e8f0", fontSize: 12, fontFamily: "inherit" }}>
+                        {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
+                      </select>
+                      <Btn small variant="success" onClick={() => handleSaveHours(e.id)}>✓</Btn>
+                      <Btn small variant="ghost" onClick={() => setEditHoursId(null)}>✕</Btn>
                     </div>
-                  ))}
+                  ) : <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 15 }}>{e.hours}h</span>}
+                  <Btn small variant="ghost" onClick={() => handleEditHours(e.id)}>✏️</Btn>
+                  <Btn small variant="danger" onClick={() => setDeleteId(e.id)}>🗑️</Btn>
+                </div>
+              </div>
+              {deleteId === e.id && (
+                <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 12px", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ color: "#f87171", fontSize: 12 }}>⚠️ Supprimer ?</span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <Btn small variant="danger" onClick={() => handleDelete(e.id)}>Supprimer</Btn>
+                    <Btn small variant="ghost" onClick={() => setDeleteId(null)}>Annuler</Btn>
+                  </div>
                 </div>
               )}
             </div>
           ))}
-        </Card>
-
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Historique des saisies</h3>
-          <div style={{ maxHeight: 420, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
-            {[...filtered].sort((a,b) => b.date.localeCompare(a.date)).map(e => (
-              <div key={e.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 10 }}>
-                  <div>
-                    <div style={{ fontSize: 12, color: "#475569", marginBottom: 3 }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR")}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                      <Badge activity={e.activity} />
-                      {e.categories && e.categories.map(c => <span key={c} style={{ background: "rgba(245,158,11,0.15)", color: "#fbbf24", padding: "2px 8px", borderRadius: 99, fontSize: 11, fontWeight: 600 }}>{c}</span>)}
-                      {e.note && <span style={{ color: "#334155", fontSize: 11 }}>{e.note}</span>}
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    {editHoursId === e.id ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <select value={editHoursVal} onChange={ev => setEditHoursVal(ev.target.value)} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(59,130,246,0.4)", borderRadius: 6, padding: "3px 6px", color: "#e2e8f0", fontSize: 12, fontFamily: "inherit" }}>
-                          {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
-                        </select>
-                        <Btn small variant="success" onClick={() => handleSaveHours(e.id)}>✓</Btn>
-                        <Btn small variant="ghost" onClick={() => setEditHoursId(null)}>✕</Btn>
-                      </div>
-                    ) : <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 16 }}>{e.hours}h</span>}
-                    <Btn small variant="ghost" onClick={() => handleEditHours(e.id)}>✏️</Btn>
-                    <Btn small variant="danger" onClick={() => setDeleteId(e.id)}>🗑️</Btn>
-                  </div>
-                </div>
-                {deleteId === e.id && (
-                  <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 10, padding: "10px 14px", marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ color: "#f87171", fontSize: 13 }}>⚠️ Confirmer la suppression ?</span>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <Btn small variant="danger" onClick={() => handleDelete(e.id)}>Supprimer</Btn>
-                      <Btn small variant="ghost" onClick={() => setDeleteId(null)}>Annuler</Btn>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
     </div>
   );
 }
@@ -541,43 +556,70 @@ function AdminDashboard({ entries, rates, budgets }) {
 
   return (
     <div>
-      <SectionTitle sub="Vue d'ensemble du club">Dashboard</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
-        {[{ label: "Heures totales", value: `${totalHours}h`, color: "#60a5fa", icon: "⏱️" }, { label: "Coût total", value: fmt(totalCost), color: "#34d399", icon: "💶" }, { label: "Budget total", value: fmt(totalBudget), color: "#fbbf24", icon: "🏦" }, { label: "Restant", value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" }].map(k => (
-          <Card key={k.label} style={{ padding: "20px 22px" }}>
-            <div style={{ fontSize: 22, marginBottom: 10 }}>{k.icon}</div>
-            <div style={{ color: k.color, fontWeight: 800, fontSize: 22 }}>{k.value}</div>
-            <div style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 600, marginTop: 4 }}>{k.label}</div>
+      <SectionTitle sub="Vue d ensemble du club">Dashboard</SectionTitle>
+
+      {/* KPIs 2x2 sur mobile */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+        {[
+          { label: "Heures totales", value: `${totalHours}h`,           color: "#60a5fa", icon: "⏱️" },
+          { label: "Coût total",     value: fmt(totalCost),             color: "#34d399", icon: "💶" },
+          { label: "Budget total",   value: fmt(totalBudget),           color: "#fbbf24", icon: "🏦" },
+          { label: "Restant",        value: fmt(totalBudget-totalCost), color: totalBudget-totalCost>=0?"#a78bfa":"#f87171", icon: totalBudget-totalCost>=0?"📊":"⚠️" },
+        ].map(k => (
+          <Card key={k.label} style={{ padding: "12px 14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+              <span style={{ fontSize: 16 }}>{k.icon}</span>
+              <span style={{ color: "#64748b", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{k.label}</span>
+            </div>
+            <div style={{ color: k.color, fontWeight: 800, fontSize: 20 }}>{k.value}</div>
           </Card>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Heures par entraîneur</h3>
+
+      {/* Entraîneurs — pleine largeur */}
+      <Card style={{ marginBottom: 12 }}>
+        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>🎿 Heures par entraîneur</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {coachStats.map(c => (
-            <div key={c.name} style={{ marginBottom: 18 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ fontSize: 14 }}>🎿 {c.name}</span>
-                <div style={{ display: "flex", gap: 16 }}><span style={{ color: "#60a5fa", fontWeight: 700 }}>{c.hours}h</span><span style={{ color: "#34d399", fontWeight: 700 }}>{fmt(c.cost)}</span></div>
+            <div key={c.name}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, color: "#e2e8f0", fontWeight: 500 }}>{c.name}</span>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <span style={{ color: "#60a5fa", fontWeight: 700, fontSize: 14 }}>{c.hours}h</span>
+                  <span style={{ color: "#34d399", fontWeight: 600, fontSize: 13 }}>{fmt(c.cost)}</span>
+                </div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 6 }}><div style={{ background: "linear-gradient(90deg,#f59e0b,#ef4444)", height: "100%", borderRadius: 99, width: `${totalHours?(c.hours/Math.max(...coachStats.map(x=>x.hours)))*100:0}%` }} /></div>
+              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 7 }}>
+                <div style={{ background: "linear-gradient(90deg,#f59e0b,#ef4444)", height: "100%", borderRadius: 99, width: `${coachStats.length && Math.max(...coachStats.map(x=>x.hours))>0 ? (c.hours/Math.max(...coachStats.map(x=>x.hours)))*100 : 0}%`, transition: "width .4s" }} />
+              </div>
             </div>
           ))}
-        </Card>
-        <Card>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#94a3b8" }}>Budget par activité</h3>
-          {actStats.map(a => (
-            <div key={a.activity} style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
-                <Badge activity={a.activity} />
-                <span style={{ color: a.remaining>=0?"#34d399":"#f87171", fontWeight: 700, fontSize: 13 }}>{fmt(a.remaining)}{a.remaining<0?" ⚠️":""}</span>
+        </div>
+      </Card>
+
+      {/* Budget activités — pleine largeur */}
+      <Card>
+        <h3 style={{ margin: "0 0 14px", fontSize: 14, color: "#94a3b8" }}>💰 Budget par activité</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {actStats.map(a => {
+            const over = a.remaining < 0;
+            return (
+              <div key={a.activity}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <Badge activity={a.activity} />
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ color: over?"#f87171":"#34d399", fontWeight: 700, fontSize: 14 }}>{fmt(a.remaining)}{over?" ⚠️":""}</div>
+                    <div style={{ color: "#334155", fontSize: 10, marginTop: 1 }}>{fmt(a.cost)} / {fmt(a.budget)}</div>
+                  </div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 8, overflow: "hidden" }}>
+                  <div style={{ background: over?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%`, transition: "width .4s" }} />
+                </div>
               </div>
-              <div style={{ background: "rgba(255,255,255,0.07)", borderRadius: 99, height: 8, overflow: "hidden" }}><div style={{ background: a.remaining<0?"linear-gradient(90deg,#ef4444,#f97316)":ACT_COLORS[a.activity]?.bar||"#3b82f6", height: "100%", borderRadius: 99, width: `${a.pct}%` }} /></div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.cost)} dépensé</span><span style={{ color: "#334155", fontSize: 10 }}>{fmt(a.budget)} budget</span></div>
-            </div>
-          ))}
-        </Card>
-      </div>
+            );
+          })}
+        </div>
+      </Card>
     </div>
   );
 }
