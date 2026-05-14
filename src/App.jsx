@@ -663,22 +663,35 @@ function CalMois({ yearMonth, events, selectedDates, onToggleDate, onDeleteEvent
 
 // Modal pour ajouter un événement au calendrier
 function AddEventModal({ dates, onSave, onClose, coaches }) {
-  const [activity, setActivity] = useState("Entrainement");
+  const [activity, setActivity] = useState("Entraînement");
   const [categories, setCategories] = useState([]);
   const [note, setNote] = useState("");
   const [hours, setHours] = useState("2");
   const [selectedCoach, setSelectedCoach] = useState(coaches.length > 0 ? coaches[0].id : null);
+
   const isCourse = activity === "Course";
   const canSave = categories.length > 0 && (!isCourse || note.trim().length > 0) && hours && selectedCoach;
-  const toggleCat = (c) => setCategories(p => p.includes(c) ? p.filter(x=>x!==c) : [...p, c]);
-  const fStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "9px 12px", color: "#e2e8f0", fontSize: 13, outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" };
-  const formatDate = (d) => new Date(d+"T00:00:00").toLocaleDateString("fr-FR", { weekday:"short", day:"numeric", month:"short" });
+
+  const toggleCat = (c) => setCategories(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c]);
+
+  const fStyle = {
+    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 8, padding: "9px 12px", color: "#e2e8f0", fontSize: 13,
+    outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit"
+  };
+
+  const formatDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("fr-FR", {
+    weekday: "short", day: "numeric", month: "short"
+  });
+
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1000 }}>
       <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px 20px 0 0", padding: 24, width: "100%", maxWidth: 480, maxHeight: "90vh", overflowY: "auto" }}>
+
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <div style={{ flex: 1 }}>
-            <h3 style={{ margin: "0 0 8px", fontSize: 16, color: "#f1f5f9" }}>Ajouter une activite</h3>
+            <h3 style={{ margin: "0 0 8px", fontSize: 16, color: "#f1f5f9" }}>Ajouter une activité</h3>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
               {[...dates].sort().map(d => (
                 <span key={d} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: 99, padding: "2px 9px", fontSize: 11, color: "#60a5fa", fontWeight: 600 }}>
@@ -687,67 +700,117 @@ function AddEventModal({ dates, onSave, onClose, coaches }) {
               ))}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 30, height: 30, color: "#94a3b8", cursor: "pointer", fontSize: 16, flexShrink: 0, marginLeft: 8 }}>x</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, color: "#94a3b8", cursor: "pointer", fontSize: 18, flexShrink: 0, marginLeft: 10 }}>×</button>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Activité */}
           <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Activite</label>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>Activité</label>
             <div style={{ display: "flex", gap: 8 }}>
-              {["Entrainement","Course"].map(a => (
-                <div key={a} onClick={() => { setActivity(a); setCategories([]); }} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: 10, cursor: "pointer", border: "2px solid " + (activity===a ? (ACT_COLORS[a] ? ACT_COLORS[a].bar : "#3b82f6") : "rgba(255,255,255,0.08)"), background: activity===a ? (ACT_COLORS[a] ? ACT_COLORS[a].bg : "rgba(59,130,246,0.15)") : "rgba(255,255,255,0.02)", color: activity===a ? (ACT_COLORS[a] ? ACT_COLORS[a].text : "#60a5fa") : "#475569", fontWeight: activity===a ? 700 : 400, fontSize: 13, userSelect: "none" }}>{a}</div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Categories <span style={{ color: "#ef4444" }}>*</span></label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(65px, 1fr))", gap: 6 }}>
-              {CATEGORIES.map(cat => {
-                const sel = categories.includes(cat);
-                return <div key={cat} onClick={() => toggleCat(cat)} style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, cursor: "pointer", border: "2px solid " + (sel ? "#3b82f6" : "rgba(255,255,255,0.08)"), background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.02)", color: sel ? "#60a5fa" : "#475569", fontSize: 12, fontWeight: sel ? 700 : 400, userSelect: "none" }}>{cat}</div>;
-              })}
-            </div>
-            {categories.length === 0 && <p style={{ color: "#f87171", fontSize: 11, margin: "5px 0 0" }}>Selectionnez au moins une categorie</p>}
-          </div>
-          <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Entraineur <span style={{ color: "#ef4444" }}>*</span></label>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {coaches.map(c => {
-                const sel = selectedCoach === c.id;
+              {["Entraînement", "Course"].map(a => {
+                const col = ACT_COLORS[a] || { bar: "#3b82f6", bg: "rgba(59,130,246,0.15)", text: "#60a5fa" };
+                const active = activity === a;
                 return (
-                  <div key={c.id} onClick={() => setSelectedCoach(c.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: "2px solid " + (sel ? "#3b82f6" : "rgba(255,255,255,0.08)"), background: sel ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.02)", userSelect: "none" }}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: sel ? "#3b82f6" : "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {sel && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
-                    </div>
-                    <span style={{ color: sel ? "#e2e8f0" : "#64748b", fontSize: 13, fontWeight: sel ? 600 : 400 }}>🎿 {c.name}</span>
+                  <div key={a} onClick={() => { setActivity(a); setCategories([]); setNote(""); }}
+                    style={{ flex: 1, textAlign: "center", padding: "12px 8px", borderRadius: 10, cursor: "pointer", border: `2px solid ${active ? col.bar : "rgba(255,255,255,0.08)"}`, background: active ? col.bg : "rgba(255,255,255,0.02)", color: active ? col.text : "#475569", fontWeight: active ? 700 : 400, fontSize: 13, userSelect: "none", transition: "all .15s" }}>
+                    {a}
+                    {active && <div style={{ fontSize: 10, marginTop: 2, color: col.text }}>✓ sélectionné</div>}
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Catégories obligatoires */}
           <div>
-            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Heures <span style={{ color: "#ef4444" }}>*</span></label>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>
+              Catégories <span style={{ color: "#ef4444" }}>*</span>
+              {categories.length > 0 && <span style={{ color: "#34d399", marginLeft: 8, fontWeight: 600 }}>({categories.length} sélectionnée{categories.length > 1 ? "s" : ""})</span>}
+            </label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(65px, 1fr))", gap: 6 }}>
+              {CATEGORIES.map(cat => {
+                const sel = categories.includes(cat);
+                return (
+                  <div key={cat} onClick={() => toggleCat(cat)} style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.02)", color: sel ? "#60a5fa" : "#475569", fontSize: 12, fontWeight: sel ? 700 : 400, userSelect: "none", transition: "all .15s" }}>
+                    {cat}
+                    {sel && <div style={{ fontSize: 9, marginTop: 1, color: "#34d399" }}>✓</div>}
+                  </div>
+                );
+              })}
+            </div>
+            {categories.length === 0 && <p style={{ color: "#f87171", fontSize: 11, margin: "6px 0 0" }}>⚠️ Sélectionnez au moins une catégorie</p>}
+          </div>
+
+          {/* Sélection entraîneur */}
+          <div>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>
+              Entraîneur <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            {coaches.length === 0 ? (
+              <p style={{ color: "#f87171", fontSize: 12 }}>⚠️ Aucun entraîneur trouvé</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {coaches.map(c => {
+                  const sel = selectedCoach === c.id;
+                  return (
+                    <div key={c.id} onClick={() => setSelectedCoach(c.id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, cursor: "pointer", border: `2px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.08)"}`, background: sel ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.02)", userSelect: "none", transition: "all .15s" }}>
+                      <div style={{ width: 20, height: 20, borderRadius: "50%", background: sel ? "#3b82f6" : "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background .15s" }}>
+                        {sel && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                      <span style={{ color: sel ? "#e2e8f0" : "#64748b", fontSize: 13, fontWeight: sel ? 600 : 400 }}>🎿 {c.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Heures */}
+          <div>
+            <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>Heures <span style={{ color: "#ef4444" }}>*</span></label>
             <select value={hours} onChange={e => setHours(e.target.value)} style={fStyle}>
               {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
             </select>
           </div>
+
+          {/* Note obligatoire si Course */}
           {isCourse && (
             <div>
-              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Note course <span style={{ color: "#ef4444" }}>*</span></label>
-              <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ex: Slalom geant, depart 9h..." style={fStyle} />
-              {!note.trim() && <p style={{ color: "#f87171", fontSize: 11, margin: "5px 0 0" }}>Note obligatoire pour une course</p>}
+              <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>
+                Note course <span style={{ color: "#ef4444" }}>*</span>
+              </label>
+              <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ex: Slalom géant, départ 9h..." style={fStyle} />
+              {!note.trim() && <p style={{ color: "#f87171", fontSize: 11, margin: "6px 0 0" }}>⚠️ Note obligatoire pour une course</p>}
             </div>
           )}
-          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-            <Btn onClick={() => { const coach = coaches.find(c => c.id === selectedCoach); onSave({ activity, categories, hours: parseInt(hours), note, coachId: selectedCoach, coachName: coach ? coach.name : "" }); }} disabled={!canSave} style={{ flex: 1 }}>
-              {dates.length > 1 ? "Ajouter (" + dates.length + " jours)" : "Ajouter"}
+
+          {/* Résumé avant validation */}
+          {canSave && (
+            <div style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 12, color: "#34d399" }}>
+              ✅ {dates.length} jour{dates.length > 1 ? "s" : ""} · {activity} · {categories.join(", ")} · {hours}h · {coaches.find(c => c.id === selectedCoach)?.name}
+            </div>
+          )}
+
+          {/* Boutons */}
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn onClick={() => {
+              const coach = coaches.find(c => c.id === selectedCoach);
+              if (!coach) return;
+              onSave({ activity, categories, hours: parseInt(hours), note, coachId: coach.id, coachName: coach.name });
+            }} disabled={!canSave} style={{ flex: 1 }}>
+              {dates.length > 1 ? `Ajouter (${dates.length} jours)` : "Ajouter"}
             </Btn>
             <Btn variant="ghost" onClick={onClose}>Annuler</Btn>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
+
 
 function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdit = false, users = [] }) {
   // ── Saison sélectionnée (une seule saison : 2026/2027)
