@@ -20,8 +20,8 @@ const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aoû
 const DAYS = ["L","M","M","J","V","S","D"];
 // Saisons disponibles : Décembre → Avril
 const SEASONS = [
-  { label: "2025 / 2026", startYear: 2025 },
   { label: "2026 / 2027", startYear: 2026 },
+  { label: "2027 / 2028", startYear: 2027 },
 ];
 
 function getSeasonMonths(startYear) {
@@ -750,14 +750,23 @@ function AddEventModal({ dates, onSave, onClose, coaches }) {
 }
 
 function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdit = false, users = [] }) {
-  const [selectedSeason, setSelectedSeason] = useState(SEASONS[0].startYear);
+  // ── Saison sélectionnée (une seule saison : 2026/2027)
+  const [selectedSeason, setSelectedSeason] = useState(2026);
   const calendarMonths = getSeasonMonths(selectedSeason);
+
+  // ── Dates sélectionnées pour multi-sélection
   const [selectedDates, setSelectedDates] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteDate, setDeleteDate] = useState(null);
 
-  // All coaches (role coach)
+  // Entraîneurs (rôle coach)
   const coaches = users.filter(u => u.role === "coach");
+
+  // Filtrer les events de la saison affichée
+  const seasonEvents = calEvents.filter(e => {
+    const d = new Date(e.date + "T00:00:00");
+    return calendarMonths.some(m => m.year === d.getFullYear() && m.month === d.getMonth());
+  });
 
   const toggleDate = (date) => {
     if (!canEdit) return;
@@ -783,20 +792,23 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
     setDeleteDate(null);
   };
 
-  const totalEntrHours = calEvents.filter(e => e.activity === "Entraînement").reduce((s,e) => s+e.hours, 0);
-  const totalCourseHours = calEvents.filter(e => e.activity === "Course").reduce((s,e) => s+e.hours, 0);
+  const totalEntrHours = seasonEvents.filter(e => e.activity === "Entraînement").reduce((s,e) => s+e.hours, 0);
+  const totalCourseHours = seasonEvents.filter(e => e.activity === "Course").reduce((s,e) => s+e.hours, 0);
   const costEntr = totalEntrHours * (rates ? (rates["Entraînement"] || 0) : 0);
   const costCourse = totalCourseHours * (rates ? (rates["Course"] || 0) : 0);
 
   return (
     <div>
+      {/* Header + sélecteur saison */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#f1f5f9" }}>Calendrier</h2>
-          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 12 }}>{canEdit ? "Cliquez sur plusieurs jours pour les selectionner, puis ajoutez une activite" : "Planning de l equipe - Decembre a Avril"}</p>
+          <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 12 }}>
+            {canEdit ? "Sélectionnez des jours puis ajoutez une activité" : "Planning de l'équipe — lecture seule"}
+          </p>
         </div>
-        {/* Sélecteur de saison */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {/* Sélecteur saison */}
+        <div style={{ display: "flex", gap: 6 }}>
           {SEASONS.map(s => (
             <button key={s.startYear} onClick={() => { setSelectedSeason(s.startYear); setSelectedDates([]); }} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: selectedSeason === s.startYear ? "linear-gradient(135deg,#3b82f6,#06b6d4)" : "rgba(255,255,255,0.06)", color: selectedSeason === s.startYear ? "#fff" : "#64748b", fontWeight: selectedSeason === s.startYear ? 700 : 400, fontSize: 12, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
               ⛷️ {s.label}
@@ -805,15 +817,15 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
         </div>
       </div>
 
-      {/* Bouton ajouter + dates sélectionnées — visible seulement si canEdit */}
+      {/* Bouton ajouter + sélection */}
       {canEdit && (
         <>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
             <Btn onClick={openModal} disabled={selectedDates.length === 0} variant="primary" small>
-              {selectedDates.length === 0 ? "Selectionnez des jours" : "Ajouter activite (" + selectedDates.length + " jour" + (selectedDates.length > 1 ? "s" : "") + ")"}
+              {selectedDates.length === 0 ? "Sélectionnez des jours" : "Ajouter activité (" + selectedDates.length + " jour" + (selectedDates.length > 1 ? "s" : "") + ")"}
             </Btn>
             {selectedDates.length > 0 && (
-              <Btn variant="ghost" small onClick={() => setSelectedDates([])}>Effacer selection</Btn>
+              <Btn variant="ghost" small onClick={() => setSelectedDates([])}>Effacer sélection</Btn>
             )}
           </div>
           {selectedDates.length > 0 && (
@@ -821,7 +833,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
               {[...selectedDates].sort().map(d => (
                 <div key={d} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: 99, padding: "3px 10px" }}>
                   <span style={{ color: "#60a5fa", fontSize: 11, fontWeight: 600 }}>{new Date(d+"T00:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}</span>
-                  <span onClick={() => toggleDate(d)} style={{ color: "#475569", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>x</span>
+                  <span onClick={() => toggleDate(d)} style={{ color: "#475569", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>×</span>
                 </div>
               ))}
             </div>
@@ -834,18 +846,18 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
         </p>
       )}
 
-      {/* Legende */}
+      {/* Légende */}
       <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
         {["Entraînement","Course"].map(a => (
-          <div key={a} style={{ display: "flex", alignItems: "center", gap: 6, background: ACT_COLORS[a] ? ACT_COLORS[a].bg : "rgba(255,255,255,0.1)", border: "1px solid " + (ACT_COLORS[a] ? ACT_COLORS[a].bar : "#fff"), borderRadius: 99, padding: "4px 10px" }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: ACT_COLORS[a] ? ACT_COLORS[a].bar : "#fff" }} />
-            <span style={{ color: ACT_COLORS[a] ? ACT_COLORS[a].text : "#fff", fontSize: 11, fontWeight: 600 }}>{a}</span>
+          <div key={a} style={{ display: "flex", alignItems: "center", gap: 6, background: ACT_COLORS[a] ? ACT_COLORS[a].bg : "rgba(59,130,246,0.1)", border: "1px solid " + (ACT_COLORS[a] ? ACT_COLORS[a].bar : "#3b82f6"), borderRadius: 99, padding: "4px 10px" }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: ACT_COLORS[a] ? ACT_COLORS[a].bar : "#3b82f6" }} />
+            <span style={{ color: ACT_COLORS[a] ? ACT_COLORS[a].text : "#60a5fa", fontSize: 11, fontWeight: 600 }}>{a}</span>
           </div>
         ))}
-        <span style={{ color: "#64748b", fontSize: 11, alignSelf: "center" }}>← Bleu = jour selectionne</span>
+        {canEdit && <span style={{ color: "#64748b", fontSize: 11, alignSelf: "center" }}>← Cliquez pour sélectionner</span>}
       </div>
 
-      {/* Mois */}
+      {/* Calendriers mois par mois */}
       {calendarMonths.map(ym => (
         <CalMois
           key={ym.year+"-"+ym.month}
@@ -862,7 +874,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
       {deleteDate && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
           <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: 24, width: "100%", maxWidth: 340, textAlign: "center" }}>
-            <p style={{ color: "#f87171", fontSize: 14, marginBottom: 16 }}>Supprimer toutes les activites du {new Date(deleteDate+"T00:00:00").toLocaleDateString("fr-FR")} ?</p>
+            <p style={{ color: "#f87171", fontSize: 14, marginBottom: 16 }}>Supprimer toutes les activités du {new Date(deleteDate+"T00:00:00").toLocaleDateString("fr-FR")} ?</p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <Btn variant="danger" onClick={() => handleDeleteDay(deleteDate)}>Supprimer</Btn>
               <Btn variant="ghost" onClick={() => setDeleteDate(null)}>Annuler</Btn>
@@ -877,113 +889,75 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
       )}
 
       {/* Résumé heures par entraîneur — visible par tous */}
-      {(() => { const seasonEvents = calEvents.filter(e => { const d = new Date(e.date+'T00:00:00'); return calendarMonths.some(m => m.year === d.getFullYear() && m.month === d.getMonth()); }); return seasonEvents.length > 0 && (
+      {seasonEvents.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#94a3b8" }}>🎿 Heures cumulées par entraîneur</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {[...new Set(calEvents.map(e => e.coachName))].sort().map(name => {
-              const ces = calEvents.filter(e => e.coachName === name);
+            {[...new Set(seasonEvents.map(e => e.coachName))].sort().map(name => {
+              const ces = seasonEvents.filter(e => e.coachName === name);
               const entr = ces.filter(e => e.activity === "Entraînement").reduce((s,e) => s+e.hours, 0);
               const course = ces.filter(e => e.activity === "Course").reduce((s,e) => s+e.hours, 0);
               const total = entr + course;
+              const allNames = [...new Set(seasonEvents.map(e => e.coachName))];
+              const maxHours = Math.max(...allNames.map(n => seasonEvents.filter(e=>e.coachName===n).reduce((s,e)=>s+e.hours,0)), 1);
               return (
                 <div key={name} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "12px 16px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: entr > 0 || course > 0 ? 10 : 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                     <span style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14 }}>🎿 {name}</span>
                     <span style={{ color: "#60a5fa", fontWeight: 800, fontSize: 16 }}>{total}h</span>
                   </div>
-                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
                     {entr > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bg : "rgba(59,130,246,0.1)", borderRadius: 99, padding: "4px 10px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5, background: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bg : "rgba(59,130,246,0.1)", borderRadius: 99, padding: "3px 10px" }}>
                         <div style={{ width: 6, height: 6, borderRadius: "50%", background: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bar : "#3b82f6" }} />
-                        <span style={{ color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", fontSize: 12, fontWeight: 600 }}>Entraînement : {entr}h</span>
+                        <span style={{ color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", fontSize: 11, fontWeight: 600 }}>Entraînement : {entr}h</span>
                       </div>
                     )}
                     {course > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: ACT_COLORS["Course"] ? ACT_COLORS["Course"].bg : "rgba(245,158,11,0.1)", borderRadius: 99, padding: "4px 10px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 5, background: ACT_COLORS["Course"] ? ACT_COLORS["Course"].bg : "rgba(245,158,11,0.1)", borderRadius: 99, padding: "3px 10px" }}>
                         <div style={{ width: 6, height: 6, borderRadius: "50%", background: ACT_COLORS["Course"] ? ACT_COLORS["Course"].bar : "#f59e0b" }} />
-                        <span style={{ color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", fontSize: 12, fontWeight: 600 }}>Course : {course}h</span>
+                        <span style={{ color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", fontSize: 11, fontWeight: 600 }}>Course : {course}h</span>
                       </div>
                     )}
                   </div>
-                  {/* Barre de progression */}
-                  {total > 0 && (() => {
-                    const allNames = [...new Set(calEvents.map(e => e.coachName))];
-                    const maxHours = Math.max(...allNames.map(n => calEvents.filter(e=>e.coachName===n).reduce((s,e)=>s+e.hours,0)), 1);
-                    return (
-                      <div style={{ marginTop: 8, background: "rgba(255,255,255,0.06)", borderRadius: 99, height: 5, overflow: "hidden" }}>
-                        <div style={{ height: "100%", borderRadius: 99, width: ((total/maxHours)*100)+"%" , background: "linear-gradient(90deg,#3b82f6,#60a5fa)", transition: "width .4s" }} />
-                      </div>
-                    );
-                  })()}
+                  <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 99, height: 5, overflow: "hidden" }}>
+                    <div style={{ height: "100%", borderRadius: 99, width: ((total/maxHours)*100)+"%", background: "linear-gradient(90deg,#3b82f6,#60a5fa)", transition: "width .4s" }} />
+                  </div>
                 </div>
               );
             })}
           </div>
-
-          {/* Total global */}
           <div style={{ marginTop: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ color: "#94a3b8", fontSize: 13 }}>Total heures planifiées</span>
-            <div style={{ display: "flex", gap: 16 }}>
-              {seasonEvents.filter(e=>e.activity==="Entraînement").reduce((s,e)=>s+e.hours,0) > 0 && (
-                <span style={{ color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", fontSize: 13 }}>
-                  Entr: {seasonEvents.filter(e=>e.activity==="Entraînement").reduce((s,e)=>s+e.hours,0)}h
-                </span>
-              )}
-              {seasonEvents.filter(e=>e.activity==="Course").reduce((s,e)=>s+e.hours,0) > 0 && (
-                <span style={{ color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", fontSize: 13 }}>
-                  Course: {seasonEvents.filter(e=>e.activity==="Course").reduce((s,e)=>s+e.hours,0)}h
-                </span>
-              )}
-              <span style={{ color: "#e2e8f0", fontWeight: 800, fontSize: 16 }}>
-                {seasonEvents.reduce((s,e)=>s+e.hours,0)}h
-              </span>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              {totalEntrHours > 0 && <span style={{ color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", fontSize: 13 }}>Entr: {totalEntrHours}h</span>}
+              {totalCourseHours > 0 && <span style={{ color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", fontSize: 13 }}>Course: {totalCourseHours}h</span>}
+              <span style={{ color: "#e2e8f0", fontWeight: 800, fontSize: 16 }}>{totalEntrHours+totalCourseHours}h</span>
             </div>
           </div>
         </div>
-      ); })()}
+      )}
 
-      {/* Couts admin */}
-      {isAdmin && (
-        <div style={{ marginTop: 20 }}>
-          <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#94a3b8" }}>Couts planifies</h3>
+      {/* Coûts — admin seulement */}
+      {isAdmin && (totalEntrHours > 0 || totalCourseHours > 0) && (
+        <div style={{ marginTop: 16 }}>
+          <h3 style={{ margin: "0 0 12px", fontSize: 14, color: "#94a3b8" }}>💰 Coûts planifiés</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[
-              { label: "Entrainements", hours: totalEntrHours, cost: costEntr, color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", bg: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bg : "rgba(59,130,246,0.1)" },
-              { label: "Courses",       hours: totalCourseHours, cost: costCourse, color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", bg: ACT_COLORS["Course"] ? ACT_COLORS["Course"].bg : "rgba(245,158,11,0.1)" },
+              { label: "Entraînements", hours: totalEntrHours, cost: costEntr, a: "Entraînement" },
+              { label: "Courses",       hours: totalCourseHours, cost: costCourse, a: "Course" },
             ].map(s => (
-              <div key={s.label} style={{ background: s.bg, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 16px" }}>
-                <div style={{ color: s.color, fontWeight: 700, fontSize: 13, marginBottom: 6 }}>{s.label}</div>
+              <div key={s.label} style={{ background: ACT_COLORS[s.a] ? ACT_COLORS[s.a].bg : "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 16px" }}>
+                <div style={{ color: ACT_COLORS[s.a] ? ACT_COLORS[s.a].text : "#e2e8f0", fontWeight: 700, fontSize: 13, marginBottom: 6 }}>{s.label}</div>
                 <div style={{ color: "#f1f5f9", fontWeight: 800, fontSize: 20 }}>{fmt(s.cost)}</div>
-                <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>{s.hours}h planifiees</div>
+                <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>{s.hours}h planifiées</div>
               </div>
             ))}
           </div>
-          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "14px 16px", marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "#94a3b8", fontSize: 13 }}>Cout total planifie</span>
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "12px 16px", marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#94a3b8", fontSize: 13 }}>Coût total planifié</span>
             <span style={{ color: "#34d399", fontWeight: 800, fontSize: 20 }}>{fmt(costEntr + costCourse)}</span>
           </div>
-          {calEvents.length > 0 && (
-            <div style={{ marginTop: 14 }}>
-              <h4 style={{ margin: "0 0 10px", fontSize: 13, color: "#64748b" }}>Detail par entraineur</h4>
-              {[...new Set(calEvents.map(e => e.coachName))].map(name => {
-                const ces = calEvents.filter(e => e.coachName === name);
-                const entr = ces.filter(e=>e.activity==="Entraînement").reduce((s,e)=>s+e.hours,0);
-                const course = ces.filter(e=>e.activity==="Course").reduce((s,e)=>s+e.hours,0);
-                const cost = entr*(rates ? rates["Entraînement"]||0 : 0) + course*(rates ? rates["Course"]||0 : 0);
-                return (
-                  <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "rgba(255,255,255,0.02)", borderRadius: 8, marginBottom: 6 }}>
-                    <span style={{ color: "#e2e8f0", fontSize: 13 }}>🎿 {name}</span>
-                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      {entr > 0 && <span style={{ color: "#60a5fa", fontSize: 11 }}>Entr: {entr}h</span>}
-                      {course > 0 && <span style={{ color: "#fbbf24", fontSize: 11 }}>Course: {course}h</span>}
-                      <span style={{ color: "#34d399", fontWeight: 600, fontSize: 12 }}>{fmt(cost)}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
     </div>
