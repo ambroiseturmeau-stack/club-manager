@@ -607,7 +607,7 @@ function AdminDashboard({ entries, rates, budgets }) {
 // ─── CALENDRIER COMPOSANTS ───────────────────────────────────────────────────
 
 // Mini calendar month view for the planning
-function CalMois({ yearMonth, events, selectedDates, onToggleDate, onDeleteEvent, canEditDays = false }) {
+function CalMois({ yearMonth, events, selectedDates, onToggleDate, onDeleteEvent, canEditDays = false, onEditDay }) {
   const { year, month } = yearMonth;
   const days = getDaysInMonth(year, month);
   const first = getFirstDay(year, month);
@@ -615,43 +615,44 @@ function CalMois({ yearMonth, events, selectedDates, onToggleDate, onDeleteEvent
 
   return (
     <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, overflow: "hidden", marginBottom: 16 }}>
-      {/* Header mois */}
       <div style={{ background: "rgba(59,130,246,0.12)", padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <span style={{ fontWeight: 700, fontSize: 15, color: "#60a5fa" }}>{MONTHS[month]} {year}</span>
       </div>
-      {/* Grille jours */}
       <div style={{ padding: 12 }}>
-        {/* Entêtes */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
           {["L","M","M","J","V","S","D"].map((d,i) => (
             <div key={i} style={{ textAlign: "center", fontSize: 10, color: "#334155", fontWeight: 700, padding: "2px 0" }}>{d}</div>
           ))}
         </div>
-        {/* Jours */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
           {Array(first).fill(null).map((_, i) => <div key={"e"+i} />)}
           {Array(days).fill(null).map((_, i) => {
             const day = i + 1;
-            const ds = `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+            const ds = year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
             const dayEvents = events.filter(e => e.date === ds);
             const isToday = ds === today;
             const isSel = selectedDates && selectedDates.includes(ds);
             const hasEntr = dayEvents.some(e => e.activity === "Entraînement");
             const hasCourse = dayEvents.some(e => e.activity === "Course");
+            const hasEvents = dayEvents.length > 0;
             return (
-              <div key={day} style={{ minHeight: 44, borderRadius: 6, background: isSel ? "rgba(59,130,246,0.2)" : isToday ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.02)", border: isSel ? "2px solid rgba(59,130,246,0.6)" : isToday ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent", padding: "3px", cursor: "pointer", position: "relative" }}
-                onClick={() => onToggleDate(ds)}>
-                <div style={{ fontSize: 11, fontWeight: isToday ? 700 : 400, color: isToday ? "#60a5fa" : "#94a3b8", marginBottom: 2, textAlign: "right", paddingRight: 2 }}>{day}</div>
-                {hasEntr && <div style={{ background: ACT_COLORS["Entraînement"].bg, borderLeft: `2px solid ${ACT_COLORS["Entraînement"].bar}`, borderRadius: 3, padding: "1px 4px", fontSize: 9, color: ACT_COLORS["Entraînement"].text, fontWeight: 600, marginBottom: 1, lineHeight: 1.4 }}>
-                  Entr. {dayEvents.filter(e=>e.activity==="Entraînement").map(e=>e.categories?.join(",")).join(" / ")}
+              <div key={day}
+                onClick={() => {
+                  if (hasEvents && canEditDays) {
+                    onEditDay(ds, dayEvents);
+                  } else {
+                    onToggleDate(ds);
+                  }
+                }}
+                style={{ minHeight: 48, borderRadius: 6, background: isSel ? "rgba(59,130,246,0.2)" : hasEvents ? "rgba(255,255,255,0.03)" : isToday ? "rgba(59,130,246,0.08)" : "rgba(255,255,255,0.01)", border: isSel ? "2px solid rgba(59,130,246,0.6)" : hasEvents && canEditDays ? "1px solid rgba(255,255,255,0.1)" : isToday ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent", padding: "3px", cursor: "pointer", position: "relative", transition: "all .1s" }}>
+                <div style={{ fontSize: 11, fontWeight: isToday ? 700 : 400, color: isToday ? "#60a5fa" : "#94a3b8", textAlign: "right", paddingRight: 2, marginBottom: 1 }}>{day}</div>
+                {hasEntr && <div style={{ background: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bg : "rgba(59,130,246,0.15)", borderLeft: "2px solid " + (ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].bar : "#3b82f6"), borderRadius: 3, padding: "1px 3px", fontSize: 9, color: ACT_COLORS["Entraînement"] ? ACT_COLORS["Entraînement"].text : "#60a5fa", fontWeight: 600, marginBottom: 1, lineHeight: 1.4, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                  Entr.
                 </div>}
-                {hasCourse && <div style={{ background: ACT_COLORS["Course"].bg, borderLeft: `2px solid ${ACT_COLORS["Course"].bar}`, borderRadius: 3, padding: "1px 4px", fontSize: 9, color: ACT_COLORS["Course"].text, fontWeight: 600, lineHeight: 1.4 }}>
-                  Course {dayEvents.filter(e=>e.activity==="Course").map(e=>e.categories?.join(",")).join(" / ")}
+                {hasCourse && <div style={{ background: ACT_COLORS["Course"] ? ACT_COLORS["Course"].bg : "rgba(245,158,11,0.15)", borderLeft: "2px solid " + (ACT_COLORS["Course"] ? ACT_COLORS["Course"].bar : "#f59e0b"), borderRadius: 3, padding: "1px 3px", fontSize: 9, color: ACT_COLORS["Course"] ? ACT_COLORS["Course"].text : "#fbbf24", fontWeight: 600, lineHeight: 1.4, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                  Course
                 </div>}
-                {dayEvents.length > 0 && canEditDays && (
-                  <div style={{ position: "absolute", top: 2, left: 2, cursor: "pointer", fontSize: 9, color: "#ef4444", fontWeight: 700, lineHeight: 1 }}
-                    onClick={ev => { ev.stopPropagation(); onDeleteEvent(ds); }}>x</div>
-                )}
+                {hasEvents && canEditDays && <div style={{ position: "absolute", top: 1, left: 1, fontSize: 8, color: "#60a5fa" }}>✏️</div>}
               </div>
             );
           })}
@@ -661,7 +662,114 @@ function CalMois({ yearMonth, events, selectedDates, onToggleDate, onDeleteEvent
   );
 }
 
-// Modal pour ajouter un événement au calendrier
+
+function DayEditModal({ date, dayEvents, onClose, onDelete, onUpdate, coaches }) {
+  const [editingId, setEditingId] = useState(null);
+  const [editCoachId, setEditCoachId] = useState(null);
+  const [editHours, setEditHours] = useState("2");
+
+  const fStyle = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 12px", color: "#e2e8f0", fontSize: 13, outline: "none", fontFamily: "inherit" };
+
+  const startEdit = (e) => {
+    setEditingId(e.id);
+    setEditCoachId(e.coachId);
+    setEditHours(String(e.hours));
+  };
+
+  const handleUpdate = (e) => {
+    const coach = coaches.find(c => c.id === editCoachId);
+    onUpdate(e.id, { coachId: editCoachId, coachName: coach ? coach.name : e.coachName, hours: parseInt(editHours) });
+    setEditingId(null);
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1000 }}>
+      <div style={{ background: "#161f2e", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px 20px 0 0", padding: 24, width: "100%", maxWidth: 480, maxHeight: "85vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 16, color: "#f1f5f9" }}>Activités du jour</h3>
+            <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 12 }}>
+              {new Date(date+"T00:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, width: 32, height: 32, color: "#94a3b8", cursor: "pointer", fontSize: 18 }}>×</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {dayEvents.map(e => (
+            <div key={e.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 14 }}>
+              {editingId === e.id ? (
+                /* Mode édition */
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <Badge activity={e.activity} />
+                    {e.categories && e.categories.length > 0 && e.categories.map(c => (
+                      <span key={c} style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", padding: "2px 7px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c}</span>
+                    ))}
+                  </div>
+                  {/* Entraîneur */}
+                  <div>
+                    <label style={{ display: "block", color: "#64748b", fontSize: 10, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Entraîneur</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      {coaches.map(c => {
+                        const sel = editCoachId === c.id;
+                        return (
+                          <div key={c.id} onClick={() => setEditCoachId(c.id)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, cursor: "pointer", border: `1px solid ${sel ? "#3b82f6" : "rgba(255,255,255,0.06)"}`, background: sel ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.02)" }}>
+                            <div style={{ width: 16, height: 16, borderRadius: "50%", background: sel ? "#3b82f6" : "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              {sel && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                            </div>
+                            <span style={{ color: sel ? "#e2e8f0" : "#64748b", fontSize: 12, fontWeight: sel ? 600 : 400 }}>🎿 {c.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {/* Heures */}
+                  <div>
+                    <label style={{ display: "block", color: "#64748b", fontSize: 10, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Heures</label>
+                    <select value={editHours} onChange={ev => setEditHours(ev.target.value)} style={{ ...fStyle, width: "100%" }}>
+                      {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}h</option>)}
+                    </select>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <Btn small variant="success" onClick={() => handleUpdate(e)} style={{ flex: 1 }}>✓ Enregistrer</Btn>
+                    <Btn small variant="ghost" onClick={() => setEditingId(null)}>Annuler</Btn>
+                  </div>
+                </div>
+              ) : (
+                /* Mode affichage */
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 6 }}>
+                      <Badge activity={e.activity} />
+                      {e.categories && e.categories.map(c => (
+                        <span key={c} style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", padding: "2px 7px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c}</span>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                      <span style={{ color: "#94a3b8", fontSize: 12 }}>🎿 {e.coachName}</span>
+                      <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 13 }}>{e.hours}h</span>
+                      {e.note && <span style={{ color: "#64748b", fontSize: 11 }}>{e.note}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0, marginLeft: 10 }}>
+                    <button onClick={() => startEdit(e)} style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 8, width: 32, height: 32, color: "#60a5fa", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>✏️</button>
+                    <button onClick={() => onDelete(e.id)} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, width: 32, height: 32, color: "#f87171", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>🗑️</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <Btn variant="ghost" onClick={onClose} style={{ width: "100%" }}>Fermer</Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AddEventModal({ dates, onSave, onClose, coaches }) {
   const [activity, setActivity] = useState("Entraînement");
   const [categories, setCategories] = useState([]);
@@ -821,6 +929,9 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
   const [selectedDates, setSelectedDates] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteDate, setDeleteDate] = useState(null);
+  // ── Edition d'un jour existant
+  const [editDayDate, setEditDayDate] = useState(null);
+  const [editDayEvents, setEditDayEvents] = useState([]);
 
   // Entraîneurs (rôle coach)
   const coaches = users.filter(u => u.role === "coach");
@@ -830,6 +941,28 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
     const d = new Date(e.date + "T00:00:00");
     return calendarMonths.some(m => m.year === d.getFullYear() && m.month === d.getMonth());
   });
+
+  const handleEditDay = (date, dayEvts) => {
+    if (!canEdit) return;
+    setEditDayDate(date);
+    setEditDayEvents(dayEvts);
+  };
+
+  const handleDeleteEntry = async (id) => {
+    await dbOps.deleteCalEvent(id);
+    const remaining = editDayEvents.filter(e => e.id !== id);
+    if (remaining.length === 0) {
+      setEditDayDate(null);
+      setEditDayEvents([]);
+    } else {
+      setEditDayEvents(remaining);
+    }
+  };
+
+  const handleUpdateEntry = async (id, updates) => {
+    await dbOps.updateCalEvent(id, updates);
+    setEditDayEvents(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
+  };
 
   const toggleDate = (date) => {
     if (!canEdit) return;
@@ -930,6 +1063,7 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
           onToggleDate={toggleDate}
           onDeleteEvent={(date) => setDeleteDate(date)}
           canEditDays={canEdit}
+          onEditDay={handleEditDay}
         />
       ))}
 
@@ -949,6 +1083,18 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
       {/* Modal ajout */}
       {showModal && selectedDates.length > 0 && (
         <AddEventModal dates={selectedDates} onSave={handleSaveEvent} onClose={() => setShowModal(false)} coaches={coaches} />
+      )}
+
+      {/* Modal édition journée */}
+      {editDayDate && editDayEvents.length > 0 && (
+        <DayEditModal
+          date={editDayDate}
+          dayEvents={editDayEvents}
+          coaches={coaches}
+          onClose={() => { setEditDayDate(null); setEditDayEvents([]); }}
+          onDelete={handleDeleteEntry}
+          onUpdate={handleUpdateEntry}
+        />
       )}
 
       {/* Résumé heures par entraîneur — visible par tous */}
@@ -1656,7 +1802,16 @@ export default function App() {
     setCalEvents(prev => prev.filter(e => e.id !== id));
   }, []);
 
-  const dbOps = { addEntry, updateEntry, deleteEntry, updateRate, updateBudget, addUser, updateUser, deleteUser, addCalEvent, deleteCalEvent };
+  const updateCalEvent = useCallback(async (id, updates) => {
+    const payload = {};
+    if (updates.coachId !== undefined) payload.coach_id = updates.coachId;
+    if (updates.coachName !== undefined) payload.coach_name = updates.coachName;
+    if (updates.hours !== undefined) payload.hours = updates.hours;
+    await supabase.from("cal_events").update(payload).eq("id", id);
+    setCalEvents(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
+  }, []);
+
+  const dbOps = { addEntry, updateEntry, deleteEntry, updateRate, updateBudget, addUser, updateUser, deleteUser, addCalEvent, deleteCalEvent, updateCalEvent };
 
   // ── Écrans chargement/erreur ──
   if (loading) return (
