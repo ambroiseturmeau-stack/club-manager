@@ -863,7 +863,11 @@ function DayEditModal({ date, dayEvents, onClose, onDelete, onUpdate, onAdd, coa
               {isCourseNew && (
                 <div>
                   <label style={{ display: "block", color: "#64748b", fontSize: 10, fontWeight: 700, marginBottom: 6, textTransform: "uppercase" }}>Note <span style={{ color: "#ef4444" }}>*</span></label>
-                  <input value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Ex: Slalom géant..." style={fStyle} />
+                  <select value={newNote} onChange={e => setNewNote(e.target.value)} style={fStyle}>
+                <option value="">— Sélectionner le lieu —</option>
+                {["Les Saisies", "Flumet", "Les Aillons"].map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+              {!newNote && <p style={{ color: "#f87171", fontSize: 11, margin: "5px 0 0" }}>⚠️ Sélectionnez un lieu de course</p>}
                 </div>
               )}
               <div style={{ display: "flex", gap: 8 }}>
@@ -1004,8 +1008,11 @@ function AddEventModal({ dates, onSave, onClose, coaches }) {
               <label style={{ display: "block", color: "#64748b", fontSize: 11, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.8 }}>
                 Note course <span style={{ color: "#ef4444" }}>*</span>
               </label>
-              <input value={note} onChange={e => setNote(e.target.value)} placeholder="Ex: Slalom géant, départ 9h..." style={fStyle} />
-              {!note.trim() && <p style={{ color: "#f87171", fontSize: 11, margin: "6px 0 0" }}>⚠️ Note obligatoire pour une course</p>}
+              <select value={note} onChange={e => setNote(e.target.value)} style={fStyle}>
+                <option value="">— Sélectionner le lieu —</option>
+                {["Les Saisies", "Flumet", "Les Aillons"].map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+              {!note && <p style={{ color: "#f87171", fontSize: 11, margin: "6px 0 0" }}>⚠️ Sélectionnez un lieu de course</p>}
             </div>
           )}
 
@@ -1265,6 +1272,59 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
         </div>
       )}
 
+      {/* Rapport détaillé des saisies — visible par tous */}
+      {seasonEvents.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3 style={{ margin: 0, fontSize: 14, color: "#94a3b8" }}>📋 Détail des saisies</h3>
+            <button
+              onClick={() => exportCalExcel(seasonEvents, rates)}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: "linear-gradient(135deg,#10b981,#06b6d4)", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              📥 Excel
+            </button>
+          </div>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                  {["Date", "Activité", "Catégories", "Entraîneur", "Heures", "Note"].map(h => (
+                    <th key={h} style={{ padding: "8px 10px", textAlign: "left", color: "#475569", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.8, whiteSpace: "nowrap" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...seasonEvents].sort((a, b) => a.date.localeCompare(b.date)).map(e => (
+                  <tr key={e.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <td style={{ padding: "9px 10px", color: "#64748b", whiteSpace: "nowrap" }}>
+                      <div>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</div>
+                      <div style={{ fontSize: 10, color: "#334155" }}>{new Date(e.date+"T00:00:00").toLocaleDateString("fr-FR", { weekday: "short" })}</div>
+                    </td>
+                    <td style={{ padding: "9px 10px" }}><Badge activity={e.activity} /></td>
+                    <td style={{ padding: "9px 10px" }}>
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                        {(e.categories || []).map(c => (
+                          <span key={c} style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", padding: "1px 6px", borderRadius: 99, fontSize: 10, fontWeight: 600 }}>{c}</span>
+                        ))}
+                      </div>
+                    </td>
+                    <td style={{ padding: "9px 10px", color: "#e2e8f0", fontWeight: 500, whiteSpace: "nowrap" }}>🎿 {e.coachName}</td>
+                    <td style={{ padding: "9px 10px", color: "#e2e8f0", fontWeight: 700 }}>{e.hours}h</td>
+                    <td style={{ padding: "9px 10px", color: "#64748b", fontSize: 11 }}>{e.note || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr style={{ borderTop: "2px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
+                  <td colSpan={4} style={{ padding: "9px 10px", color: "#64748b", fontSize: 11, fontWeight: 700 }}>TOTAL</td>
+                  <td style={{ padding: "9px 10px", color: "#60a5fa", fontWeight: 800, fontSize: 14 }}>{seasonEvents.reduce((s,e) => s+e.hours, 0)}h</td>
+                  <td />
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Coûts — admin seulement */}
       {isAdmin && (totalEntrHours > 0 || totalCourseHours > 0) && (
         <div style={{ marginTop: 16 }}>
@@ -1291,6 +1351,47 @@ function CalendrierView({ user, calEvents, dbOps, rates, isAdmin = false, canEdi
   );
 }
 
+
+// ─── EXPORT CALENDRIER ───────────────────────────────────────────────────────
+function exportCalExcel(events, rates) {
+  const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
+  const headers = ["Date", "Jour", "Activité", "Catégories", "Entraîneur", "Heures", "Lieu / Note", "Coût (€)"];
+  const rows = sorted.map(e => {
+    const d = new Date(e.date + "T00:00:00");
+    const cout = e.hours * (rates ? (rates[e.activity] || 0) : 0);
+    return [
+      d.toLocaleDateString("fr-FR"),
+      d.toLocaleDateString("fr-FR", { weekday: "long" }),
+      e.activity,
+      (e.categories || []).join(", "),
+      e.coachName,
+      e.hours,
+      e.note || "",
+      cout.toFixed(2),
+    ];
+  });
+
+  const totalHours = sorted.reduce((s, e) => s + e.hours, 0);
+  const totalCost = sorted.reduce((s, e) => s + e.hours * (rates ? (rates[e.activity] || 0) : 0), 0);
+  rows.push(["", "", "", "", "", "", "", ""]);
+  rows.push(["TOTAL", "", "", "", "", totalHours, "", totalCost.toFixed(2)]);
+
+  const BOM = "﻿";
+  const csv = BOM + [headers, ...rows]
+    .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(";"))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const date = new Date().toLocaleDateString("fr-FR").replace(/\//g, "-");
+  link.href = url;
+  link.download = `calendrier-rapport-${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 // ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
 function exportExcel(entries, rates) {
